@@ -28,17 +28,16 @@ public:
 		}
 	}
 
-	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista	
-		Nodo *new_node = new Nodo(val);	
+	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista				
 		if( _head.load() == nullptr){			
-			_head.store(new_node);			
+			_head.store(new Nodo(val));			
 		}else{
 			std::atomic<Nodo *> buscador;
 			buscador = _head.load();
 			while(buscador.load()->_next != nullptr){
 				buscador = buscador.load()->_next;
 			}								
-			buscador.load()->_next = new_node;					
+			buscador.load()->_next = new Nodo(val);					
 		}
 		
 	}
@@ -60,7 +59,7 @@ public:
 		return n->_val;
 	}
 
-	class Iterador {
+	class Iterador {//Es un Iterador estático. Si se modifica la lista hay que crear Iterador nuevo.
 	public:
 		Iterador() : _lista(nullptr), _nodo_sig(nullptr) {}
 
@@ -77,6 +76,8 @@ public:
 		T& Siguiente() {
 			return _nodo_sig->_val;
 		}
+
+
 
 		void Avanzar() {
 			_nodo_sig = _nodo_sig->_next;
