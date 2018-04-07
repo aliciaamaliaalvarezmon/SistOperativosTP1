@@ -3,6 +3,8 @@
 
 #include <atomic>
 
+#define nullptr 0
+
 template <typename T>
 class Lista {
 private:
@@ -26,9 +28,25 @@ public:
 		}
 	}
 
-	void push_front(const T& val) {
-		/* Completar. Debe ser atómico. */
+	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista	
+		Nodo *new_node = new Nodo(val);	
+		if( _head.load() == nullptr){			
+			_head.store(new_node);			
+		}else{
+			std::atomic<Nodo *> buscador;
+			buscador = _head.load();
+			while(buscador.load()->_next != nullptr){
+				buscador = buscador.load()->_next;
+			}								
+			buscador.load()->_next = new_node;					
+		}
+		
 	}
+
+		/* Completar. Debe ser atómico. */
+	
+
+
 
 	T& front() const {
 		return _head.load()->_val;
@@ -83,3 +101,32 @@ public:
 };
 
 #endif /* LISTA_ATOMICA_H__ */
+
+
+
+
+
+
+
+
+
+
+/*
+
+	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista
+		if( _head.load() == nullptr){
+			_head.load()->_val = val;
+		}else{
+			Iterador it = CrearIt();
+			while(HaySiguiente(it)){
+				it.Avanzar();
+			}
+			it.Snew(atomic<Nodo >);
+
+
+
+
+		}
+
+		/* Completar. Debe ser atómico. */
+/*	}*/
