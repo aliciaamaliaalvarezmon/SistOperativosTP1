@@ -1,16 +1,19 @@
 #ifndef HASHMAP_CONCURRENTE_H__
 #define HASHMAP_CONCURRENTE_H__
 #include <iostream>
-#include "ListaAtomica.hpp"
+#include <pthread.h>
 
+#include "ListaAtomica.hpp"
 //template <typename T>
 using namespace std;
+
+
 
 class ConcurrentHashMap{
 private:
 	Lista<pair<string, int>> _entradas[26]; //hay 26 letras en el ABC
-	//Lista<pair<string, int>>* _inicio;
-
+	pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;
+	
 int hash_func(string key){
 	 int numero = key[0] - '0'- 49;
 	return (numero);
@@ -57,8 +60,61 @@ public:
 		return false;
 	}
 
-	pair<string, unsigned int>maximum(unsigned int nt){
+
+	void *maxaux(void *t_num){		
+		for(int i= (*((pair<int, int> *) t_num)).first; i < 26; i= i+ (*((pair<int, int> *) t_num)).second ){			
+			Lista<pair<string, int>>::Iterador it =_entradas[i].CrearIt();
+			while(it.HaySiguiente()){
+				if(it.Siguiente().second > _maximo.second){
+					_maximo = it.Siguiente(); 
+				}
+				it.Avanzar();
+			}			
+		}
+		
+	}
+
+
+
+	pair<string,  int> maximum(unsigned int nt){
+		int realnt;
+		if(nt <= 26){
+			realnt = nt;
+		}else{
+			realnt = 26;
+		}		
+		pthread_t thread[realnt];
+		pair<int, int> tids[realnt];
+		int tid;
+	
+
+		for(tid = 0; tid <  nt; tid++  ){
+			tids[tid].first = tid;
+			tids[tid].second = realnt;
+			pthread_create(&thread[tid], NULL, maxaux, &tids[tid]);//le pasa a maxaux la thread actual y la cantidad de threads.
+		}
+
+		for (tid = 0; tid < realnt; ++tid){
+         pthread_join(thread[tid], NULL);
+     	}
+     	return _maximo;
+	}
+
+
+};
+
+
+
+
+
+/*
+
+
+
+
+	void *maxaux(void *t_num){
 		//version sin concurrrencia nt = 1
+
 		pair<string, int> maximo("", 0);
 		for(int i=0; i < 26; i++){			
 			Lista<pair<string, int>>::Iterador it =_entradas[i].CrearIt();
@@ -76,26 +132,7 @@ public:
 
 
 
-
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 
