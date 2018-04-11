@@ -1,5 +1,5 @@
-#ifndef HASHMAP_CONCURRENTE_H__
-#define HASHMAP_CONCURRENTE_H__
+#ifndef CONCURRENT_HASH_MAP_H__
+#define CONCURRENT_HASH_MAP_H__
 #include <iostream>
 #include <pthread.h>
 
