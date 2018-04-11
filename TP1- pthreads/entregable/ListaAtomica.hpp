@@ -18,7 +18,7 @@ private:
 
 public:
 	Lista() : _head(nullptr) {}
-	~Lista() {
+	~Lista() { 
 		Nodo *n, *t;
 		n = _head.load();
 		while (n) {
@@ -28,7 +28,7 @@ public:
 		}
 	}
 
-	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista				
+	/*void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista				
 		if( _head.load() == nullptr){			
 			_head.store(new Nodo(val));			
 		}else{
@@ -40,6 +40,28 @@ public:
 			buscador.load()->_next = new Nodo(val);					
 		}
 		
+	}*/
+
+/*	void push_front(const T & val){
+		std::atomic<Nodo *> aux;
+		std::atomic<Nodo > nuevo;
+		aux.store(_head.load());		
+		nuevo.store(new Nodo(val));
+		_head.store(nuevo);
+		nuevo->_next.store(aux);
+
+	}
+*/
+	void push_front(const T & val){		
+ 		std::atomic<Nodo*> nuevo;
+ 		nuevo.store(new Nodo(val)); 		
+ 		while(true){
+ 			Nodo* aux = _head;	
+ 			if(_head.compare_exchange_strong(aux, nuevo)){
+ 				nuevo->next = aux;
+ 				break;
+ 			}
+ 		}
 	}
 
 		/* Completar. Debe ser atómico. */

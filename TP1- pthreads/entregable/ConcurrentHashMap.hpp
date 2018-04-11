@@ -8,27 +8,36 @@
 using namespace std;
 
 
-
 class ConcurrentHashMap{
 private:
-	Lista<pair<string, int>> _entradas[26]; //hay 26 letras en el ABC
+	Lista<pair<string, int>>* _entradas; //hay 26 letras en el ABC
 	pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;
 	
-int hash_func(string key){
-	 int numero = key[0] - '0'- 49;
-	return (numero);
-}
-
-public:	
-	/*ConcurrentHashMap(){
-		for(int i = 0; i < 26; i++){			
-			_entradas[i] = (new (Lista<pair<sting, int>>()));
-		}
+	int hash_func(string key){
+		 int numero = key[0] - '0'- 49;
+		return (numero);
 	}
 
-	~ConcurrentHashMap();*/
+public:	
+	ConcurrentHashMap(){
+		_entradas = new( Lista<pair<string, int>> [26]);
+	/*	for(int i = 0; i< 26; i++){
+			Lista<pair <string, int>>* lista = new(Lista<pair, int>());
+			_entradas[i] = Lista<pair<string, int>>();
+		}*/
+		_maximo = pair<string, int >("", 0);
+		
+	}
 
-	void addAndInc(string key){
+	~ConcurrentHashMap(){
+		for(int i = 0; i < 26; i++){
+			delete _entradas[i];			
+		}
+		delete _entradas;
+
+	};
+	void addAndInc(string key);
+	/*void addAndInc(string key){
 		int pos = hash_func(key);		
 		Lista<pair<string, int>>::Iterador it =_entradas[pos].CrearIt();
 		bool esta = false;
@@ -45,7 +54,7 @@ public:
 			_entradas[pos].push_front( pair<string, int>(key, 1));
 		}
 
-	}
+	}*/
 
 	bool member(string key){
 		int pos = hash_func(key);
@@ -76,7 +85,7 @@ public:
 
 
 
-	pair<string,  int> maximum(unsigned int nt){
+	pair<string, int> maximum(unsigned int nt){
 		int realnt;
 		if(nt <= 26){
 			realnt = nt;
@@ -103,7 +112,24 @@ public:
 
 };
 
+void ConcurrentHashMap::addAndInc(string key){
+		int pos = hash_func(key);		
+		Lista<pair<string, int>>::Iterador it =_entradas[pos].CrearIt();
+		bool esta = false;
+		while(it.HaySiguiente() and !esta){
+			if(it.Siguiente().first ==key){
+				esta = true;
+				it.Siguiente().second++;				
+			}else{
+				it.Avanzar();
+			}
 
+		} 
+		if (esta == false){
+			_entradas[pos].push_front( pair<string, int> (key, 1));
+		}
+
+	}
 
 
 
