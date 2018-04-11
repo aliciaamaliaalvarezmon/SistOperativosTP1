@@ -1,18 +1,22 @@
 #include "ConcurrentHashMap.h"
-#include <iostream>
-#include <pthread.h>
-
-#include "ListaAtomica.hpp"
+#include <mutex>
 //template <typename T>
+
+
 using namespace std;
+
+
+std::mutex m;
+std::mutex m2;
 
 ConcurrentHashMap::ConcurrentHashMap(){
 	_entradas = new( Lista<pair<string, int>>* [26]);
 	for(int i = 0; i< 26; i++){
 		Lista<pair <string, int>>* lista = new (Lista<pair <string, int>>);
-		_entradas[i] = lista;
+		_entradas[i] = lista;		
 	}
 	_maximo = pair<string, int >("", 0);
+	_ultima = 0;
 }
 
 ConcurrentHashMap::~ConcurrentHashMap(){
@@ -27,14 +31,16 @@ void ConcurrentHashMap::addAndInc(string key){
 	Lista<pair<string, int>>::Iterador it = (*_entradas)[pos].CrearIt();
 	bool esta = false;
 	while(it.HaySiguiente() and !esta){
-		if(it.Siguiente().first ==key){
+		if(it.Siguiente().first ==key){			
 			esta = true;
+			//parte critica en ej 6			
 			it.Siguiente().second++;				
 		}else{
 			it.Avanzar();
 		}
 	} 
 	if (esta == false){
+		//parte critica en ej 6
 		(*_entradas)[pos].push_front( pair<string, int>(key, 1));
 	}
 }
@@ -53,17 +59,59 @@ bool ConcurrentHashMap::member(string key){
 }
 
 
-void *ConcurrentHashMap::maxaux(void *t_num){		
-	for(int i= (*((pair<int, int> *) t_num)).first; i < 26; i= i+ (*((pair<int, int> *) t_num)).second ){			
-		Lista<pair<string, int>>::Iterador it =(*_entradas[i]).CrearIt();
-		while(it.HaySiguiente()){
-			if(it.Siguiente().second > _maximo.second){
-				_maximo = it.Siguiente(); 
-			}
-			it.Avanzar();
-		}			
+
+void * ConcurrentHashMap::maxaux(){	
+		while(_ultima < 26){	
+			m.lock();
+			Lista<pair<string, int>>::Iterador it =(*_entradas[_ultima]).CrearIt();
+			_ultima++;
+			m.unlock();
+			while(it.HaySiguiente()){
+				if(it.Siguiente().second >= _maximo.second){
+					m2.lock();
+					_maximo = it.Siguiente(); 
+					m2.unlock();
+				}
+				it.Avanzar();
+			}			
+		}		
+		
+			return nullptr;
+		
 	}
-}
+
+
+	void* max(void* aux){	
+		ConcurrentHashMap * conchashmap = static_cast<ConcurrentHashMap*>(aux);
+		conchashmap->maxaux();
+		return nullptr;
+
+	}
+
+	pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
+		int realnt;
+		if(nt <= 26){
+			realnt = nt;
+		}else{
+			realnt = 26;
+		}		
+		pthread_t thread[realnt];
+		//pair<int, int> tids[realnt];
+		int tid;
+		for(tid = 0; tid <  realnt; tid++  ){
+			//tids[tid].first = tid;
+			//tids[tid].second = realnt;
+			pthread_create(&thread[tid], NULL, max, this);//le pasa a maxaux la thread actual y la cantidad de threads.
+		}
+
+		for (tid = 0; tid < realnt; ++tid){
+         pthread_join(thread[tid], NULL);
+     	}
+     	return _maximo;
+	}
+
+
+
 /*
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	int realnt;
