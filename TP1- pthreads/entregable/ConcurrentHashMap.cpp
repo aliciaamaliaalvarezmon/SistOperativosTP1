@@ -1,0 +1,91 @@
+#include "ConcurrentHashMap.h"
+#include <iostream>
+#include <pthread.h>
+
+#include "ListaAtomica.hpp"
+//template <typename T>
+using namespace std;
+
+ConcurrentHashMap::ConcurrentHashMap(){
+	_entradas = new( Lista<pair<string, int>>* [26]);
+	for(int i = 0; i< 26; i++){
+		Lista<pair <string, int>>* lista = new (Lista<pair <string, int>>);
+		_entradas[i] = lista;
+	}
+	_maximo = pair<string, int >("", 0);
+}
+
+ConcurrentHashMap::~ConcurrentHashMap(){
+	for(int i = 0; i < 26; i++){
+		delete _entradas[i];			
+	}
+	delete _entradas;
+}
+
+void ConcurrentHashMap::addAndInc(string key){
+	int pos = hash_func(key);		
+	Lista<pair<string, int>>::Iterador it = (*_entradas)[pos].CrearIt();
+	bool esta = false;
+	while(it.HaySiguiente() and !esta){
+		if(it.Siguiente().first ==key){
+			esta = true;
+			it.Siguiente().second++;				
+		}else{
+			it.Avanzar();
+		}
+	} 
+	if (esta == false){
+		(*_entradas)[pos].push_front( pair<string, int>(key, 1));
+	}
+}
+
+bool ConcurrentHashMap::member(string key){
+	int pos = hash_func(key);
+	Lista<pair<string, int>>::Iterador it =(*_entradas)[pos].CrearIt();
+	while(it.HaySiguiente()){
+		if(it.Siguiente().first == key){			
+			return true;			
+		}else{
+			it.Avanzar();
+		}
+	} 
+	return false;
+}
+
+
+void *ConcurrentHashMap::maxaux(void *t_num){		
+	for(int i= (*((pair<int, int> *) t_num)).first; i < 26; i= i+ (*((pair<int, int> *) t_num)).second ){			
+		Lista<pair<string, int>>::Iterador it =(*_entradas[i]).CrearIt();
+		while(it.HaySiguiente()){
+			if(it.Siguiente().second > _maximo.second){
+				_maximo = it.Siguiente(); 
+			}
+			it.Avanzar();
+		}			
+	}
+}
+/*
+pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
+	int realnt;
+	if(nt <= 26){
+		realnt = nt;
+	}else{
+		realnt = 26;
+	}		
+	pthread_t thread[realnt];
+	pair<int, int> tids[realnt];
+	int tid;
+	
+	for(tid = 0; tid <  nt; tid++  ){
+		tids[tid].first = tid;
+		tids[tid].second = realnt;
+		pthread_create(&thread[tid], NULL, maxaux, &tids[tid]);//le pasa a maxaux la thread actual y la cantidad de threads.
+	}
+
+	for (tid = 0; tid < realnt; ++tid){
+        pthread_join(thread[tid], NULL);
+   	}
+   	return _maximo;
+}
+*/
+

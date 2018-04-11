@@ -2,6 +2,7 @@
 #define LISTA_ATOMICA_H__
 
 #include <atomic>
+using namespace std;
 
 #define nullptr 0
 
@@ -11,7 +12,7 @@ private:
 	struct Nodo {
 		Nodo(const T& val) : _val(val), _next(nullptr) {}
 		T _val;
-		Nodo *_next;
+		Nodo* _next;
 	};
 
 	std::atomic<Nodo *> _head;
@@ -28,47 +29,19 @@ public:
 		}
 	}
 
-	/*void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista				
-		if( _head.load() == nullptr){			
-			_head.store(new Nodo(val));			
-		}else{
-			std::atomic<Nodo *> buscador;
-			buscador = _head.load();
-			while(buscador.load()->_next != nullptr){
-				buscador = buscador.load()->_next;
-			}								
-			buscador.load()->_next = new Nodo(val);					
-		}
-		
-	}*/
-
-/*	void push_front(const T & val){
-		std::atomic<Nodo *> aux;
-		std::atomic<Nodo > nuevo;
-		aux.store(_head.load());		
-		nuevo.store(new Nodo(val));
-		_head.store(nuevo);
-		nuevo->_next.store(aux);
-
-	}
-*/
 	void push_front(const T & val){		
- 		std::atomic<Nodo*> nuevo;
- 		nuevo.store(new Nodo(val)); 		
- 		while(true){
- 			Nodo* aux = _head;	
- 			if(_head.compare_exchange_strong(aux, nuevo)){
- 				nuevo->next = aux;
- 				break;
- 			}
- 		}
+		std::atomic<Nodo*> nuevo;
+		nuevo.store(new Nodo(val)); 		
+		while(true){
+			Nodo* aux = _head.load();
+			if(_head.compare_exchange_strong(aux, nuevo)){
+				nuevo.load()->_next = aux;
+				break;
+			}
+		}	
 	}
 
 		/* Completar. Debe ser atómico. */
-	
-
-
-
 	T& front() const {
 		return _head.load()->_val;
 	}
@@ -125,31 +98,3 @@ public:
 
 #endif /* LISTA_ATOMICA_H__ */
 
-
-
-
-
-
-
-
-
-
-/*
-
-	void push_front(const T& val) {//Asumo que esta operacion es para agregar nodos a la lista
-		if( _head.load() == nullptr){
-			_head.load()->_val = val;
-		}else{
-			Iterador it = CrearIt();
-			while(HaySiguiente(it)){
-				it.Avanzar();
-			}
-			it.Snew(atomic<Nodo >);
-
-
-
-
-		}
-
-		/* Completar. Debe ser atómico. */
-/*	}*/
