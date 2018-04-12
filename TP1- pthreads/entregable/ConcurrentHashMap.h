@@ -2,11 +2,12 @@
 #define CONCURRENT_HASH_MAP_H__
 #include <iostream>
 #include <pthread.h>
+#include <fstream>
 #include <mutex>
 #include "ListaAtomica.hpp"
 #include <vector>
 #include <string>
-#include <studio.h>
+#include <stdio.h>
 //template <typename T>
 using namespace std;
 
@@ -32,6 +33,28 @@ public:
 	bool member(string key);
 	void *maxaux();
 	pair<string, int> maximum(unsigned int nt);
+	ConcurrentHashMap& operator=(const ConcurrentHashMap& TuVieja){
+		while(_entradas.size() > 0){
+			delete(_entradas[_entradas.size()-1]);
+			_entradas.pop_back();
+		}
+		for(int i =0; i < 26; i++){
+			//Lista<pair<string, int> >* lant = TuVieja._entradas[i];
+			Lista<pair<string, int> >::Iterador it = (*TuVieja._entradas[i]).CrearIt();
+			Lista<pair<string, int> >* l;
+			while(it.HaySiguiente()){
+				(*l).push_front(it.Siguiente());
+				it.Avanzar();
+			}
+			_entradas.push_back(l);
+		}
+		_maximo = TuVieja._maximo;
+		_ultima = TuVieja._ultima;
+		return *this;
+	}
+	
 
 };
+
+ConcurrentHashMap count_words(string arch);
 #endif /* HASHMAP_CONCURRENTE_H__ */

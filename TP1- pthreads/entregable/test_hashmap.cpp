@@ -20,7 +20,8 @@ int main(void) {
 	max = h.maximum(1);	
 	cout << max.first << " " << max.second << endl;
 
-
+	h = count_words("sarasa.txt");
+	
 	return 0;
 }
 

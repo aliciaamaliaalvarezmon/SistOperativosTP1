@@ -1,5 +1,4 @@
 #include "ConcurrentHashMap.h"
-#include <mutex>
 
 //template <typename T>
 
@@ -133,14 +132,19 @@ void * ConcurrentHashMap::maxaux(){
 
 ConcurrentHashMap count_words(string arch){
 	ConcurrentHashMap h;
-	FILE *fp =fopen(arch);
-	while(!(feof (fp) )){
-		
+	const char* archivo = arch.c_str();
+	ifstream input;
+	input.open(archivo);
+
+	string aux;
+	while(!input.eof()){
+		input >> aux;
+		h.addAndInc(aux);
 	}
-
-
-
+	return h;
 }
+
+
 /*
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
