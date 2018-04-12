@@ -9,7 +9,7 @@ using namespace std;
 
 std::mutex m;
 std::mutex m2;
-
+std::mutex m3;
 /*ConcurrentHashMap::ConcurrentHashMap(){
 	_entradas = new (Lista<pair<string, int>>*[26]);
 	cout << (*_entradas).size() << endl;
@@ -52,8 +52,9 @@ void ConcurrentHashMap::addAndInc(string key){
 	while(it.HaySiguiente() and !esta){
 		if(it.Siguiente().first ==key){			
 			esta = true;
-			//parte critica en ej 6			
-			it.Siguiente().second++;				
+			m3.lock();//parte critica en ej 6			
+			it.Siguiente().second++;
+			m3.unlock();				
 		}else{
 			it.Avanzar();
 		}
@@ -86,12 +87,12 @@ void * ConcurrentHashMap::maxaux(){
 			Lista<pair<string, int>>::Iterador it =(*_entradas[_ultima]).CrearIt();
 			_ultima++;				
 			m.unlock();			
- 			while(it.HaySiguiente()){				
-				if(it.Siguiente().second >= _maximo.second){					
-					m2.lock();
-					_maximo = it.Siguiente();
-					m2.unlock();					
+ 			while(it.HaySiguiente()){	
+ 				m2.lock();			
+				if(it.Siguiente().second >= _maximo.second){						
+					_maximo = it.Siguiente();										
 				}
+				m2.unlock();
 				it.Avanzar();
 			}				
 		}			
@@ -130,7 +131,16 @@ void * ConcurrentHashMap::maxaux(){
      	return _maximo;
 	}
 
+ConcurrentHashMap count_words(string arch){
+	ConcurrentHashMap h;
+	FILE *fp =fopen(arch);
+	while(!(feof (fp) )){
+		
+	}
 
+
+
+}
 /*
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){

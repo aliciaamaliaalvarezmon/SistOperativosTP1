@@ -4,7 +4,7 @@
 
 CXX = g++
 CXXFLAGS = -std=c++11
-LDLIBS = -lpthread
+LDLIBS = -pthread
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(LDLIBS) -c $<
@@ -14,11 +14,13 @@ OBJ = ConcurrentHashMap.o
 
 all: $(BIN) $(OBJ)
 
+tp: ConcurrentHashMap.cpp
+	$(CXX) $(CXXFLAGS) $(LDLIBS) test_hashmap.cpp 	 
 
 $(BIN): ListaAtomica.hpp
 
-#test-2: $(OBJ) test-2.cpp
-#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-2.cpp $(OBJ) $(LDLIBS)
+test-2: $(OBJ) test-2.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-2.cpp $(OBJ) $(LDLIBS)
 	
 #test-2-run: test-2
 #	awk -f corpus.awk corpus | sort >corpus-post

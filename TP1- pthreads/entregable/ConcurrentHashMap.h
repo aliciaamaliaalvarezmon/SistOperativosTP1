@@ -5,6 +5,8 @@
 #include <mutex>
 #include "ListaAtomica.hpp"
 #include <vector>
+#include <string>
+#include <studio.h>
 //template <typename T>
 using namespace std;
 
@@ -30,7 +32,6 @@ public:
 	bool member(string key);
 	void *maxaux();
 	pair<string, int> maximum(unsigned int nt);
+
 };
-
-
 #endif /* HASHMAP_CONCURRENTE_H__ */
