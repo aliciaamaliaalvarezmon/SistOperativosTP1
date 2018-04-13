@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ConcurrentHashMap.cpp"
+#include "ConcurrentHashMap.h"
 
 using namespace std;
 
