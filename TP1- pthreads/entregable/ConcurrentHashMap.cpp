@@ -5,17 +5,17 @@
 
 using namespace std;
 
-
+mutex posicion[26];
 std::mutex m;
 std::mutex m2;
-std::mutex m3;
-pair<string, int> _maximo("", 0);
 
+pair<string, int> _maximo("", 0);
+//_entradas
 
 ConcurrentHashMap::ConcurrentHashMap(){	
 	for(int i = 0; i< 26; i++){		
 		Lista<pair<string, int> >* l= new (Lista<pair<string, int> >);				 
-		_entradas.push_back(l);
+		tabla.push_back(l);
 	}
 	//_maximo= pair<string, int >("", 0);
 	//_ultima  = 0;
@@ -24,7 +24,7 @@ ConcurrentHashMap::ConcurrentHashMap(){
 
 ConcurrentHashMap::~ConcurrentHashMap(){		
 	for(int i = 0; i < 26; i++){			
-		delete(_entradas[i]);		
+		delete(tabla[i]);		
 	}
 }
 
@@ -32,27 +32,29 @@ ConcurrentHashMap::~ConcurrentHashMap(){
 
 void ConcurrentHashMap::addAndInc(string key){
 	int pos = hash_func(key);	
-	Lista<pair<string, int>>::Iterador it = (*_entradas[pos]).CrearIt();
-	bool esta = false;
+	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();
+	bool esta = false;	
 	while(it.HaySiguiente() and !esta){
-		if(it.Siguiente().first ==key){			
+		if(it.Siguiente().first ==key){									
 			esta = true;
-			m3.lock();//parte critica en ej 6			
+			posicion[pos].lock();					
 			it.Siguiente().second++;
-			m3.unlock();				
+			posicion[pos].unlock();								
 		}else{
 			it.Avanzar();
 		}
 	} 
 	if (esta == false){
-		//parte critica en ej 6
-		(*_entradas[pos]).push_front(pair<string, int>(key, 1));
+		//parte critica en ej 6		
+		posicion[pos].lock();
+		(*tabla[pos]).push_front(pair<string, int>(key, 1));
+		posicion[pos].unlock();
 	}	
 }
 
 bool ConcurrentHashMap::member(string key){
 	int pos = hash_func(key);	
-	Lista<pair<string, int>>::Iterador it =(*_entradas[pos]).CrearIt();
+	Lista<pair<string, int>>::Iterador it =(*tabla[pos]).CrearIt();
 	while(it.HaySiguiente()){
 		if(it.Siguiente().first == key){						
 			return true;			
@@ -68,7 +70,7 @@ bool ConcurrentHashMap::member(string key){
 void * ConcurrentHashMap::maxaux( int &ultima){	
 		while(ultima < 26){										
 			m.lock();
-			Lista<pair<string, int>>::Iterador it =(*_entradas[ultima]).CrearIt();
+			Lista<pair<string, int>>::Iterador it =(*tabla[ultima]).CrearIt();
 			ultima++;				
 			m.unlock();			
  			while(it.HaySiguiente()){	
@@ -131,7 +133,38 @@ ConcurrentHashMap count_words(string arch){
 }
 
 
+void * count_wordsaux(void* aux){
+	Hashescritor * caux = static_cast<Hashescritor*>(aux);	
+	const char* archivo = (caux)->arch.c_str();
+	ifstream input;
+	input.open(archivo);
+	string alo;
+	while(!input.eof()){
+		input >> alo;
+		(caux->h)->addAndInc(alo); 
+	}
+	cout << "llegue"<< endl;
+	return nullptr;	
+}
 
+
+ConcurrentHashMap count_words2(std::list<string>archs){
+	ConcurrentHashMap escri;
+	Hashescritor aux;
+	aux.h = &escri;		
+	auto it = std::begin(archs);	
+	int cantarchivos = archs.size();	
+	pthread_t thread[cantarchivos];
+	int tid;
+	for(tid = 0; tid <  cantarchivos; tid++  ){	
+		aux.arch = (*it);	
+		pthread_create(&thread[tid], NULL, count_wordsaux, &aux);//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
+		++it;
+	}
+	for (tid = 0; tid < cantarchivos; ++tid){
+        pthread_join(thread[tid], NULL);
+   	} 
+}
 
 
 
