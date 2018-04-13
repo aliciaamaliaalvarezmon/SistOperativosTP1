@@ -14,13 +14,8 @@ using namespace std;
 
 class ConcurrentHashMap{
 private:
-	/*Lista<pair<string, int>>** _entradas; //hay 26 letras en el ABC
-	pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;
-	int _ultima;
-*/
 	vector<Lista<pair<string, int> >* > _entradas; //hay 26 letras en el ABC
-	pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;	
-    int  _ultima; 	
+	//pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;	 
 	int hash_func(string key){
 	 int numero = key[0] - '0'- 49;
 		return (numero);
@@ -31,7 +26,7 @@ public:
 	~ConcurrentHashMap();
 	void addAndInc(string key);
 	bool member(string key);
-	void *maxaux();
+	void *maxaux(int &ultima);
 	pair<string, int> maximum(unsigned int nt);
 	ConcurrentHashMap& operator=(const ConcurrentHashMap& TuVieja){
 		while(_entradas.size() > 0){
@@ -47,14 +42,15 @@ public:
 				it.Avanzar();
 			}
 			_entradas.push_back(l);
-		}
-		_maximo = TuVieja._maximo;
-		_ultima = TuVieja._ultima;
+		}			
 		return *this;
+				
 	}
 	
 
 };
 
+
 ConcurrentHashMap count_words(string arch);
-#endif /* HASHMAP_CONCURRENTE_H__ */
+
+#endif /* HASHMAP_CONCURRENTE_H__ */	
