@@ -19,8 +19,10 @@ int main(void) {
 	printf("%d\n", h.member(p2) );
 	max = h.maximum(5);	
 	cout << max.first << " " << max.second << endl;
-	cout << "llegue y ahora es otro problema" << endl;*/
+	cout << "llegue y ahora es otro problema" << endl;
 	h = count_words("sarasa.txt");
+
+	
 	
 	return 0;
 }

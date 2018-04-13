@@ -5,10 +5,6 @@
 
 using namespace std;
 
-struct Hashcontador{
-		ConcurrentHashMap* h;
-		int _ultima;
-	};
 
 std::mutex m;
 std::mutex m2;
@@ -26,9 +22,9 @@ ConcurrentHashMap::ConcurrentHashMap(){
 	//void* operator new[] (std::size_t size);
 }
 
-ConcurrentHashMap::~ConcurrentHashMap(){	
-	for(int i = 0; i < 26; i++){		
-		delete(_entradas[i]);
+ConcurrentHashMap::~ConcurrentHashMap(){		
+	for(int i = 0; i < 26; i++){			
+		delete(_entradas[i]);		
 	}
 }
 
@@ -129,7 +125,7 @@ ConcurrentHashMap count_words(string arch){
 	string alo;	
 	while(!input.eof()){
 		input >> alo;		
-		h.addAndInc(alo);		
+		h.addAndInc(alo);	
 	}	
 	return h;	
 }
