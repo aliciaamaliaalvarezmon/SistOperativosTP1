@@ -9,7 +9,7 @@ int main(void) {
 	string p2 ="bprueba";
 	list<string> l;
 	l.push_front("sarasa.txt");
-	//l.push_front("segunto.txt");
+	l.push_front("segunto.txt");
 	printf("%d\n", h.member(p) );
 	h.addAndInc(p);
 	printf("%d\n", h.member(p) );
@@ -25,8 +25,7 @@ int main(void) {
 	cout << "llegue y ahora es otro problema" << endl;
 	h = count_words("sarasa.txt");
 	cout << "llegue y ahora es otro problema" << endl;
-	h = count_words2(l);
-	
+	h = count_words2(l);	
 	return 0;
 }
 

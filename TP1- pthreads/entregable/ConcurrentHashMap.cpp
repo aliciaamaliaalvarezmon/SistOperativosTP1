@@ -27,7 +27,7 @@ ConcurrentHashMap::ConcurrentHashMap(){
 	//void* operator new[] (std::size_t size);
 }
 
-ConcurrentHashMap::~ConcurrentHashMap(){		
+ConcurrentHashMap::~ConcurrentHashMap(){	
 	for(int i = 0; i < 26; i++){			
 		delete(tabla[i]);		
 	}	
@@ -148,7 +148,7 @@ ConcurrentHashMap count_words(string arch){
 
 
 void * count_wordsaux(void* aux){
-	Hashescritor * caux = static_cast<Hashescritor*>(aux);	
+	Hashescritor * caux = (Hashescritor*) aux;	
 	const char* archivo = (caux)->arch.c_str();
 	ifstream input;
 	input.open(archivo);
@@ -156,28 +156,30 @@ void * count_wordsaux(void* aux){
 	while(!input.eof()){
 		input >> alo;
 		(caux->h)->addAndInc(alo); 
-	}
-	
+	}		
 	return nullptr;	
+	
 }
 
 
 ConcurrentHashMap count_words2(std::list<string>archs){
 	ConcurrentHashMap escri;
-	Hashescritor aux;
-	aux.h = &escri;		
-	auto it = std::begin(archs);	
 	int cantarchivos = archs.size();	
+	Hashescritor* separador[cantarchivos];				
+	auto it = std::begin(archs);		
 	pthread_t thread[cantarchivos];
 	int tid;
 	for(tid = 0; tid <  cantarchivos; tid++  ){	
-		aux.arch = (*it);	
-		pthread_create(&thread[tid], NULL, count_wordsaux, &aux);//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
+		separador[tid] = new (Hashescritor);
+		separador[tid]->h = &escri;
+		separador[tid]->arch = (*it);	
+		pthread_create(&thread[tid], NULL, count_wordsaux, separador[tid]);//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
 		++it;
-	}
+	}	
 	for (tid = 0; tid < cantarchivos; ++tid){
         pthread_join(thread[tid], NULL);
-   	}
+   	}   
+   	return escri;
 }
 
 
