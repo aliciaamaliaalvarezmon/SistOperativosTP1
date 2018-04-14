@@ -3,11 +3,16 @@
 //template <typename T>
 
 
+
 using namespace std;
 
+std::atomic<int> maxi(0);
+std::atomic<int> addi(0);
+int nada = 0;
+
 //mutex posicion[26];
-std::mutex m;
-std::mutex m2;
+mutex m;
+mutex m2;
 pthread_mutex_t posicion[26];
 pair<string, int> _maximo("", 0);
 //_entradas
@@ -31,6 +36,9 @@ ConcurrentHashMap::~ConcurrentHashMap(){
 
 
 void ConcurrentHashMap::addAndInc(string key){
+	while(!maxi.compare_exchange_weak(nada, maxi)){
+	}
+	addi++;	
 	int pos = hash_func(key);	
 	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();
 	bool esta = false;	
@@ -50,6 +58,7 @@ void ConcurrentHashMap::addAndInc(string key){
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
 		pthread_mutex_unlock(&posicion[pos]);
 	}	
+	addi--;
 }
 
 bool ConcurrentHashMap::member(string key){
@@ -96,7 +105,10 @@ void* max(void* aux){
 
 
 
-pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){		
+pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){	
+	maxi++;
+	while(!addi.compare_exchange_weak(nada, addi)){
+	}	
 	int realnt;
 	if(nt <= 26){
 		realnt = nt;
@@ -113,8 +125,10 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	}
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
-   	}   	
+   	}
+   	maxi--;     	 	
    	return _maximo;
+   	//maxi--; 
 }
 
 
