@@ -45,8 +45,10 @@ public:
 				it.Avanzar();
 			}
 			tabla.push_back(l);
-		}			
+		}
+		cout << "llegue"<< endl;			
 		return *this;
+
 	}
 	
 

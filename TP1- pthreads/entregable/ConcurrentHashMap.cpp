@@ -5,10 +5,10 @@
 
 using namespace std;
 
-mutex posicion[26];
+//mutex posicion[26];
 std::mutex m;
 std::mutex m2;
-
+pthread_mutex_t posicion[26];
 pair<string, int> _maximo("", 0);
 //_entradas
 
@@ -25,7 +25,7 @@ ConcurrentHashMap::ConcurrentHashMap(){
 ConcurrentHashMap::~ConcurrentHashMap(){		
 	for(int i = 0; i < 26; i++){			
 		delete(tabla[i]);		
-	}
+	}	
 }
 
 
@@ -37,18 +37,18 @@ void ConcurrentHashMap::addAndInc(string key){
 	while(it.HaySiguiente() and !esta){
 		if(it.Siguiente().first ==key){									
 			esta = true;
-			posicion[pos].lock();					
+			pthread_mutex_lock(&posicion[pos]);					
 			it.Siguiente().second++;
-			posicion[pos].unlock();								
+			pthread_mutex_unlock(&posicion[pos]);								
 		}else{
 			it.Avanzar();
 		}
 	} 
 	if (esta == false){
 		//parte critica en ej 6		
-		posicion[pos].lock();
+		pthread_mutex_lock(&posicion[pos]);	
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
-		posicion[pos].unlock();
+		pthread_mutex_unlock(&posicion[pos]);
 	}	
 }
 
@@ -143,7 +143,7 @@ void * count_wordsaux(void* aux){
 		input >> alo;
 		(caux->h)->addAndInc(alo); 
 	}
-	cout << "llegue"<< endl;
+	
 	return nullptr;	
 }
 
@@ -163,7 +163,7 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 	}
 	for (tid = 0; tid < cantarchivos; ++tid){
         pthread_join(thread[tid], NULL);
-   	} 
+   	}
 }
 
 
