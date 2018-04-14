@@ -14,8 +14,8 @@ using namespace std;
 
 
 class ConcurrentHashMap{
-//private:
-public:	
+private:
+//public:	
 	vector<Lista<pair<string, int> >* > tabla; //hay 26 letras en el ABC
 	//pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;	 
 	int hash_func(string key){
@@ -23,10 +23,11 @@ public:
 		return (numero);
 	}
 
-//public:
+public:
 
 	ConcurrentHashMap();
 	~ConcurrentHashMap();
+	void mostrarHash();
 	void addAndInc(string key);
 	bool member(string key);
 	void *maxaux(int &ultima);

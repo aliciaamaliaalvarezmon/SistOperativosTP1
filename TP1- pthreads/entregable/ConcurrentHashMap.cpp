@@ -74,9 +74,6 @@ bool ConcurrentHashMap::member(string key){
 	} 
 	return false;
 }
-
-
-
 void * ConcurrentHashMap::maxaux( int &ultima){	
 		while(ultima < 26){										
 			m.lock();
@@ -115,13 +112,13 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 		realnt = nt;
 	}else{
 		realnt = 26;
-	}	
+	}
 	Hashcontador aux;
 	aux.h = this;
 	aux._ultima = 0;
 	pthread_t thread[realnt];
 	int tid;
-	for(tid = 0; tid <  realnt; tid++  ){		
+	for(tid = 0; tid <  realnt; tid++  ){
 		pthread_create(&thread[tid], NULL, max, &aux );//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
 	}
 	for (tid = 0; tid < realnt; ++tid){
@@ -132,7 +129,16 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
    	//maxi--; 
 }
 
-
+void ConcurrentHashMap::mostrarHash(){
+	for(int i = 0; i < 26; i++){
+		Lista<pair<string, int>>::Iterador it =(*tabla[i]).CrearIt();
+		while(it.HaySiguiente()){
+			cout << "<" << it.Siguiente().first << ", " << it.Siguiente().second << ">";
+			it.Avanzar();
+		}
+		cout << endl;
+	}
+}
 
 ConcurrentHashMap count_words(string arch){
 	ConcurrentHashMap h;	
