@@ -59,12 +59,20 @@ struct Hashcontador{
 
 struct Hashescritor{
 		ConcurrentHashMap* h;
-		string arch;
-	};	
+		string arch;		
+	};
+
+struct HashescritorConc{
+		ConcurrentHashMap* h;		
+		list<string>* lista;	
+		list<string>::iterator	ite;		
+	};
 
 
 
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words2(list<string>archs);
+ConcurrentHashMap count_words3(unsigned int n,
+list<string>archs);
 
 #endif /* HASHMAP_CONCURRENTE_H__ */	

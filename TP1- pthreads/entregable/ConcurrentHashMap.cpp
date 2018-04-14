@@ -15,6 +15,7 @@ mutex m;
 mutex m2;
 pthread_mutex_t posicion[26];
 pair<string, int> _maximo("", 0);
+mutex ej4;
 //_entradas
 
 ConcurrentHashMap::ConcurrentHashMap(){	
@@ -43,9 +44,9 @@ void ConcurrentHashMap::addAndInc(string key){
 	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();
 	bool esta = false;	
 	while(it.HaySiguiente() and !esta){
-		if(it.Siguiente().first ==key){									
-			esta = true;
-			pthread_mutex_lock(&posicion[pos]);					
+		if(it.Siguiente().first ==key){		
+			pthread_mutex_lock(&posicion[pos]);								
+			esta = true;							
 			it.Siguiente().second++;
 			pthread_mutex_unlock(&posicion[pos]);								
 		}else{
@@ -175,15 +176,60 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 		separador[tid]->arch = (*it);	
 		pthread_create(&thread[tid], NULL, count_wordsaux, separador[tid]);//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
 		++it;
-	}	
+	}		
 	for (tid = 0; tid < cantarchivos; ++tid){
         pthread_join(thread[tid], NULL);
    	}   
    	return escri;
 }
 
+void * count_words_limthreads_aux(void* aux){
+	HashescritorConc * caux = (HashescritorConc*) aux;
+	while((caux->ite) != ((caux->lista)->end())){	
+		const char* archivo = (*(caux)->ite).c_str();
+		ifstream input;
+		input.open(archivo);
+		string alo;
+		while(!input.eof()){
+			input >> alo;
+			(caux->h)->addAndInc(alo); 
+		}
+		ej4.lock();
+		(caux->ite)++;
+		ej4.unlock();	
+	}	
+	return nullptr;	
+	
+}
 
 
+
+
+ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
+	int realnt;
+	if(n <= archs.size()){
+		realnt = n;
+	}else{
+		realnt = archs.size();
+	}	
+	ConcurrentHashMap escri;		
+	HashescritorConc* separador = new (HashescritorConc);
+	separador->h = &escri;
+	separador->lista = &archs;
+	separador->ite =  archs.begin();//iterador a principio de lista			
+	pthread_t thread[realnt];
+	int tid;
+	for(tid = 0; tid <  realnt; tid++  ){	
+		pthread_create(&thread[tid], NULL, count_words_limthreads_aux, separador);//le pasa a max el struct Hashcontador, con nuestro hash y la thread	
+		
+	}		
+	for (tid = 0; tid < realnt; ++tid){
+        pthread_join(thread[tid], NULL);
+   	}   
+   	return escri;
+
+	
+}
 
 
 
@@ -201,7 +247,7 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 
 /*
 
-pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
+pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){	
 		//version sin concurrrencia nt = 1
 
 		pair<string, int> maximo("", 0);
