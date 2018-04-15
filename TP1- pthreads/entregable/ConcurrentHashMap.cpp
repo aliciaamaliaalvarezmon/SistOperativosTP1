@@ -197,7 +197,7 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 	}		 
    	return escri;
 }
-
+//cambiar estos locks
 void * count_words_limthreads_aux(void* aux){
 	HashescritorConc * caux = (HashescritorConc*) aux;
 	while((caux->ite) != ((caux->lista)->end())){	
@@ -248,50 +248,51 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 }
 
 
-void * count_words_limthreads_aux2(void* aux){
+void * count_words_limthreads_aux2(void* aux){	
 	HashescritorConc2 * caux = (HashescritorConc2*) aux;
-	while((caux->ite) != ((caux->lista)->end())){
-		ej5.lock();	
-		const char* archivo = (*(caux)->ite).c_str();
+	while((caux->ite) != ((caux->lista)->end())){ //and ((*(caux->ult_escri)) < (caux->h)->size())){
+	ej5.lock();				
+		const char* archivo = (*(caux)->ite).c_str();		
 		ConcurrentHashMap* hash_actual = (*(caux->h))[(*(caux->ult_escri))];
 		(*(caux->ult_escri))++;
-		(caux->ite)++;
-		ej5.unlock();
-		(*hash_actual) = count_words(archivo);		
-	}	
+		(caux->ite)++;		
+		(*hash_actual) = count_words(archivo);	
+	ej5.unlock();		
+	}
+	
 	return nullptr;	
 	
 }
 
 
-pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
 	int realnt;
 	if(p_archivos <= archs.size()){
 		realnt = p_archivos;
 	}else{
 		realnt = archs.size();
-	}	
+	}		
 	vector<ConcurrentHashMap* > escri;
 	for (int i = 0; i < archs.size(); ++i){
         ConcurrentHashMap* nuevi = new (ConcurrentHashMap); 
         escri.push_back(nuevi);
    	}   
 	list<string>::iterator	it= std::begin(archs);
-	HashescritorConc2* separador[realnt];
-	pthread_t thread[realnt];
 	int _ultima = 0;
+	//HashescritorConc2* separador[realnt];
+	HashescritorConc2* separador = new (HashescritorConc2);
+	separador->h = &escri;
+	separador->lista = &archs;
+	separador->ite = it;
+	separador->ult_escri = &_ultima;	
+	pthread_t thread[realnt];
 	int tid;
 	for(tid = 0; tid < realnt; tid++){
-		separador[tid] = new (HashescritorConc2);
-		separador[tid]->h = &escri;
-		separador[tid]->lista = &archs;
-		separador[tid]->ite = archs.begin();
-		separador[tid]->ult_escri = &_ultima;
 		pthread_create(&thread[tid], NULL, count_words_limthreads_aux2, separador);
 	}
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
-   	}   
+   	} 
    	//aqui todos los hashmap de escri estan llenos    
    ConcurrentHashMap hash_recolector;
    for(int i =0; i < escri.size(); i++){
@@ -306,7 +307,7 @@ pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximo
    	pair<string, int> supermax = hash_recolector.maximum(p_maximos);
    	for (int i = 0; i < archs.size(); ++i){       
         delete(escri[i]);
-   	}     
+   	} 
    	return supermax;
 }
 
