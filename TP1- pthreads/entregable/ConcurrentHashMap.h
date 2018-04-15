@@ -31,6 +31,7 @@ public:
 	void addAndInc(string key);
 	bool member(string key);
 	void *maxaux(int &ultima);
+	Lista<pair <string, int> >* entrada(int i);
 	pair<string, int> maximum(unsigned int nt);
 	ConcurrentHashMap& operator=(const ConcurrentHashMap& TuVieja){	
 		while(tabla.size() > 0){
@@ -69,11 +70,19 @@ struct HashescritorConc{
 		list<string>::iterator	ite;		
 	};
 
+struct HashescritorConc2{
+		vector<ConcurrentHashMap* >* h;		
+		list<string>* lista;	
+		list<string>::iterator	ite;
+		int* ult_escri;		
+	};
+
+
 
 
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words2(list<string>archs);
-ConcurrentHashMap count_words3(unsigned int n,
-list<string>archs);
+ConcurrentHashMap count_words3(unsigned int n, list<string>archs);
+pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 
 #endif /* HASHMAP_CONCURRENTE_H__ */	

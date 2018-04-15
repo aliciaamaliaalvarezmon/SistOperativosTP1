@@ -25,7 +25,8 @@ int main(void) {
 	//cout << max.first << " " << max.second << endl;
 	h = count_words("sarasa.txt");
 	h.mostrarHash();
-	h = count_words2(l);	
+	h = count_words2(l);
+	h = count_words3(2, l);	
 	return 0;
 }
 
