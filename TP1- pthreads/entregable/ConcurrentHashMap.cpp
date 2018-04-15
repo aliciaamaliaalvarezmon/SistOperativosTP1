@@ -42,24 +42,22 @@ void ConcurrentHashMap::addAndInc(string key){
 	}
 	addi++;	
 	int pos = hash_func(key);	
-	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();
-	bool esta = false;	
+	pthread_mutex_lock(&posicion[pos]);		
+	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();	
+	bool esta = false;				
 	while(it.HaySiguiente() and !esta){
-		if(it.Siguiente().first ==key){		
-			pthread_mutex_lock(&posicion[pos]);								
+		if(it.Siguiente().first ==key){												
 			esta = true;							
 			it.Siguiente().second++;
-			pthread_mutex_unlock(&posicion[pos]);								
+			break;											
 		}else{
 			it.Avanzar();
 		}
-	} 
+	} 	
 	if (esta == false){
-		//parte critica en ej 6		
-		pthread_mutex_lock(&posicion[pos]);	
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
-		pthread_mutex_unlock(&posicion[pos]);
 	}	
+	pthread_mutex_unlock(&posicion[pos]);
 	addi--;
 }
 
@@ -174,6 +172,7 @@ void * count_wordsaux(void* aux){
 	
 }
 
+//version vieje
 
 ConcurrentHashMap count_words2(std::list<string>archs){
 	ConcurrentHashMap escri;
@@ -185,7 +184,7 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 	for(tid = 0; tid <  cantarchivos; tid++  ){	
 		separador[tid] = new (Hashescritor);
 		separador[tid]->h = &escri;
-		separador[tid]->arch = (*it);	
+		separador[tid]->arch = (*it);			
 		pthread_create(&thread[tid], NULL, count_wordsaux, separador[tid]);//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
 		++it;
 	}		
@@ -197,6 +196,12 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 	}		 
    	return escri;
 }
+
+
+
+
+
+
 //cambiar estos locks
 void * count_words_limthreads_aux(void* aux){
 	HashescritorConc * caux = (HashescritorConc*) aux;
