@@ -16,6 +16,7 @@ mutex m2;
 pthread_mutex_t posicion[26];
 pair<string, int> _maximo("", 0);
 mutex ej4;
+mutex ej4b;
 mutex ej5;
 //_entradas
 
@@ -202,11 +203,13 @@ ConcurrentHashMap count_words2(std::list<string>archs){
 
 
 
-//cambiar estos locks
-void * count_words_limthreads_aux(void* aux){
-	HashescritorConc * caux = (HashescritorConc*) aux;
+//cambiar estos locks version vieja aux
+/*void * count_words_limthreads_aux(void* aux){
+	HashescritorConc * caux = (HashescritorConc*) aux;		
 	while((caux->ite) != ((caux->lista)->end())){	
+		ej4.lock();
 		const char* archivo = (*(caux)->ite).c_str();
+		ej4.unlock();
 		ifstream input;
 		input.open(archivo);
 		string alo;
@@ -214,17 +217,18 @@ void * count_words_limthreads_aux(void* aux){
 			input >> alo;
 			(caux->h)->addAndInc(alo); 
 		}
-		ej4.lock();
+		ej4b.lock();			
 		(caux->ite)++;
-		ej4.unlock();	
+		ej4b.unlock();			
 	}	
+			
 	return nullptr;	
 	
 }
 
 
 
-
+//version vieja
 ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 	int realnt;
 	if(n <= archs.size()){
@@ -247,6 +251,71 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
         pthread_join(thread[tid], NULL);
    	}  
    	delete(separador); 
+   	return escri;
+
+	
+}*/
+
+
+//version nueva aux
+void * count_words_limthreads_aux(void* aux){
+	HashescritorConc * caux = (HashescritorConc*) aux; 
+	while((caux->ult) < ((caux->vecti)->size())){	
+		//cout << "aqui no hay drama?" << caux->ult  << endl;
+		ej4.lock();
+		const char* archivo = (*(caux)->vecti)[(caux->ult)].c_str();
+		(caux->ult)++;
+		ej4.unlock();
+		if(caux->ult > (caux->vecti)->size()){
+			break;
+		}
+		//cout << "aqui no hay drama? salida" << caux->ult  << endl;
+		ifstream input;				
+		input.open(archivo);
+		string alo;
+		while(!input.eof()){			
+			ej4b.lock();
+			input >> alo;
+			//cout << "input" << alo << endl;
+			(caux->h)->addAndInc(alo); 
+			ej4b.unlock();
+		}		
+		input.close();		
+	}			
+	return nullptr;	
+	
+}
+
+//version nueva
+ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
+	int realnt;
+	if(n <= archs.size()){
+		realnt = n;
+	}else{
+		realnt = archs.size();
+	}	
+	ConcurrentHashMap escri;
+	vector<string> archivador;
+	list<string>::iterator	iteaux = archs.begin();
+	while(iteaux != archs.end()){
+		archivador.push_back((*iteaux));
+		iteaux++;
+	}		
+	//tenemos vector  archivador con los archivos de lista 	
+	HashescritorConc* separador = new (HashescritorConc);
+	separador->h = &escri;
+	separador->vecti = &archivador;
+	separador->ult =  0;//ultima posicion de vector			
+	pthread_t thread[realnt];
+	int tid;
+	for(tid = 0; tid <  realnt; tid++  ){	
+		pthread_create(&thread[tid], NULL, count_words_limthreads_aux, separador);//le pasa a max el struct Hashcontador, con nuestro hash y la thread	
+		
+	}			
+	for (tid = 0; tid < realnt; ++tid){
+        pthread_join(thread[tid], NULL);
+   	}  
+   	delete(separador);    
    	return escri;
 
 	

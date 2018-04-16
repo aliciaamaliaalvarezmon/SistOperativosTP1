@@ -63,13 +63,18 @@ struct Hashescritor{
 		ConcurrentHashMap* h;
 		string arch;		
 	};
-
-struct HashescritorConc{
+/*struct HashescritorConc{
 		ConcurrentHashMap* h;		
 		list<string>* lista;	
 		list<string>::iterator	ite;		
 	};
+*/
 
+struct HashescritorConc{
+		ConcurrentHashMap* h;		
+		vector<string>* vecti;	
+		int ult;		
+	};	
 struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
 		list<string>* lista;	
