@@ -41,7 +41,7 @@ ConcurrentHashMap::~ConcurrentHashMap(){
 void ConcurrentHashMap::addAndInc(string key){
 	while(!maxi.compare_exchange_weak(nada, maxi)){
 	}
-	addi++;	
+	addi.fetch_add(1);
 	int pos = hash_func(key);	
 	pthread_mutex_lock(&posicion[pos]);		
 	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();	
@@ -59,7 +59,7 @@ void ConcurrentHashMap::addAndInc(string key){
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
 	}	
 	pthread_mutex_unlock(&posicion[pos]);
-	addi--;
+	addi.fetch_sub(1); 
 }
 
 bool ConcurrentHashMap::member(string key){
@@ -109,7 +109,7 @@ void* max(void* aux){
 
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){	
-	maxi++;
+	maxi.fetch_add(1);
 	while(!addi.compare_exchange_weak(nada, addi)){
 	}	
 	int realnt;
@@ -129,7 +129,7 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
    	}
-   	maxi--;     	 	
+   	maxi.fetch_sub(1);     	 	
    	return _maximo;
    	//maxi--; 
 }
@@ -138,7 +138,7 @@ void ConcurrentHashMap::mostrarHash(){
 	for(int i = 0; i < 26; i++){
 		Lista<pair<string, int>>::Iterador it =(*tabla[i]).CrearIt();
 		while(it.HaySiguiente()){
-			cout << "<" << it.Siguiente().first << ", " << it.Siguiente().second << ">";
+			cout << "<" << it.Siguiente().first << ", " << it.Siguiente().second << "> ";
 			it.Avanzar();
 		}
 		cout << endl;
@@ -259,7 +259,7 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 
 //version nueva aux
 void * count_words_limthreads_aux(void* aux){
-	HashescritorConc * caux = (HashescritorConc*) aux; 
+	HashescritorConc * caux = (HashescritorConc*) aux;
 	while((caux->ult) < ((caux->vecti)->size())){	
 		//cout << "aqui no hay drama?" << caux->ult  << endl;
 		ej4.lock();
@@ -274,11 +274,9 @@ void * count_words_limthreads_aux(void* aux){
 		input.open(archivo);
 		string alo;
 		while(!input.eof()){			
-			ej4b.lock();
 			input >> alo;
 			//cout << "input" << alo << endl;
-			(caux->h)->addAndInc(alo); 
-			ej4b.unlock();
+			(caux->h)->addAndInc(alo);
 		}		
 		input.close();		
 	}			
@@ -287,7 +285,7 @@ void * count_words_limthreads_aux(void* aux){
 }
 
 //version nueva
-ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
+ConcurrentHashMap count_words3(unsigned int n, list<string> archs){
 	int realnt;
 	if(n <= archs.size()){
 		realnt = n;
@@ -300,7 +298,7 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 	while(iteaux != archs.end()){
 		archivador.push_back((*iteaux));
 		iteaux++;
-	}		
+	}
 	//tenemos vector  archivador con los archivos de lista 	
 	HashescritorConc* separador = new (HashescritorConc);
 	separador->h = &escri;
@@ -308,11 +306,10 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 	separador->ult =  0;//ultima posicion de vector			
 	pthread_t thread[realnt];
 	int tid;
-	for(tid = 0; tid <  realnt; tid++  ){	
+	for(tid = 0; tid <  realnt; tid++  ){
 		pthread_create(&thread[tid], NULL, count_words_limthreads_aux, separador);//le pasa a max el struct Hashcontador, con nuestro hash y la thread	
-		
 	}			
-	for (tid = 0; tid < realnt; ++tid){
+	for (tid = 0; tid < realnt; tid++){
         pthread_join(thread[tid], NULL);
    	}  
    	delete(separador);    
@@ -339,7 +336,7 @@ void * count_words_limthreads_aux2(void* aux){
 }
 
 
-pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
+pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
 	int realnt;
 	if(p_archivos <= archs.size()){
 		realnt = p_archivos;

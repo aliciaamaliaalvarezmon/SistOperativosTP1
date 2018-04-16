@@ -73,7 +73,7 @@ struct Hashescritor{
 struct HashescritorConc{
 		ConcurrentHashMap* h;		
 		vector<string>* vecti;	
-		int ult;		
+		int ult;
 	};	
 struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
