@@ -456,9 +456,6 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
         delete(escri[i]);
    	}
    	return supermax;
-	
-	pair<string, int> res("",0);
-	return res;
 }
 
 

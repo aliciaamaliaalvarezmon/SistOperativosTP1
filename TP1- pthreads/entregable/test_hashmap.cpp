@@ -33,6 +33,7 @@ int main(void) {
 	//h = count_words3(4, l);	
 	//h.mostrarHash();
 	max = maximum(2,2,l);
+	cout << max.first << " " << max.second << endl;
 	return 0;
 }
 
