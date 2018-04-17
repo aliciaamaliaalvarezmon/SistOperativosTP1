@@ -75,14 +75,19 @@ struct HashescritorConc{
 		vector<string>* vecti;	
 		int ult;
 	};	
-struct HashescritorConc2{
+/*struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
 		list<string>* lista;	
 		list<string>::iterator	ite;
 		int* ult_escri;		
 	};
-
-
+*/
+struct HashescritorConc2{
+		vector<ConcurrentHashMap* >* h;		
+		vector<string>* vecti;	
+		int	ult_pos;
+		int ult_escri;		
+	};
 
 
 ConcurrentHashMap count_words(string arch);

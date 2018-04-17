@@ -18,6 +18,7 @@ pair<string, int> _maximo("", 0);
 mutex ej4;
 mutex ej4b;
 mutex ej5;
+mutex ej5b;
 //_entradas
 
 ConcurrentHashMap::ConcurrentHashMap(){	
@@ -80,19 +81,23 @@ Lista<pair <string, int> >* ConcurrentHashMap::entrada(int i){
 }
 
 void * ConcurrentHashMap::maxaux( int &ultima){	
-		while(ultima < 26){										
+		while(ultima < 26){
+			if(ultima >= 26){
+				break;
+			}									
 			m.lock();
-			Lista<pair<string, int>>::Iterador it =(*tabla[ultima]).CrearIt();
+			Lista<pair<string, int>>::Iterador it =(*tabla[ultima]).CrearIt();			
 			ultima++;				
-			m.unlock();			
- 			while(it.HaySiguiente()){	
- 				m2.lock();			
-				if(it.Siguiente().second >= _maximo.second){						
+			m.unlock();								
+ 			while(it.HaySiguiente()){
+ 				m2.lock();	 							
+				if((it.HaySiguiente()) and (it.Siguiente().second >= _maximo.second)){						
 					_maximo = it.Siguiente();										
 				}
-				m2.unlock();
-				it.Avanzar();
-			}				
+				m2.unlock();						
+				it.Avanzar();				
+								
+			}						
 		}			
 		return nullptr;
 		
@@ -100,13 +105,11 @@ void * ConcurrentHashMap::maxaux( int &ultima){
 
 
 void* max(void* aux){			
-	Hashcontador * caux = static_cast<Hashcontador*>(aux);
+	Hashcontador * caux = (Hashcontador*) aux;
 	//ConcurrentHashMap * conchashmap = static_cast<ConcurrentHashMap*>(aux);
 	(caux->h)->maxaux(caux->_ultima);
 	return nullptr;
 }
-
-
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){	
 	maxi.fetch_add(1);
@@ -122,7 +125,7 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	aux.h = this;
 	aux._ultima = 0;
 	pthread_t thread[realnt];
-	int tid;
+	int tid;	
 	for(tid = 0; tid <  realnt; tid++  ){
 		pthread_create(&thread[tid], NULL, max, &aux );//le pasa a max el struct Hashcontador, con nuestro hash y la thread		
 	}
@@ -260,22 +263,19 @@ ConcurrentHashMap count_words3(unsigned int n, list<string>archs){
 //version nueva aux
 void * count_words_limthreads_aux(void* aux){
 	HashescritorConc * caux = (HashescritorConc*) aux;
-	while((caux->ult) < ((caux->vecti)->size())){	
-		//cout << "aqui no hay drama?" << caux->ult  << endl;
+	while((caux->ult) < ((caux->vecti)->size())){			
 		ej4.lock();
 		const char* archivo = (*(caux)->vecti)[(caux->ult)].c_str();
 		(caux->ult)++;
 		ej4.unlock();
 		if(caux->ult > (caux->vecti)->size()){
 			break;
-		}
-		//cout << "aqui no hay drama? salida" << caux->ult  << endl;
+		}		
 		ifstream input;				
 		input.open(archivo);
 		string alo;
 		while(!input.eof()){			
-			input >> alo;
-			//cout << "input" << alo << endl;
+			input >> alo;			
 			(caux->h)->addAndInc(alo);
 		}		
 		input.close();		
@@ -318,7 +318,7 @@ ConcurrentHashMap count_words3(unsigned int n, list<string> archs){
 	
 }
 
-
+/*
 void * count_words_limthreads_aux2(void* aux){	
 	HashescritorConc2 * caux = (HashescritorConc2*) aux;
 	while((caux->ite) != ((caux->lista)->end())){ //and ((*(caux->ult_escri)) < (caux->h)->size())){
@@ -383,8 +383,85 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 }
 
 
+*/
 
 
+void * count_words_limthreads_aux2(void* aux){	
+	HashescritorConc2 * caux = (HashescritorConc2*) aux;
+	while((caux->ult_pos) < ((caux->vecti)->size())){//and ((*(caux->ult_escri)) < (caux->h)->size())){		
+		ej5.lock();				
+		const char* archivo = (*(caux)->vecti)[(caux->ult_pos)].c_str();
+		(caux->ult_pos)++;	
+		if(caux->ult_pos > (caux->vecti)->size()){
+			break;
+		}	
+		ConcurrentHashMap* hash_actual = (*(caux->h))[(caux->ult_escri)];			
+		(*hash_actual) = count_words(archivo);		
+		(caux->ult_escri)++;	
+		if(caux->ult_escri > (caux->vecti)->size()){//vecti = archivador cuya longitud es igual a la cantidad de hash que tengo
+			break;
+		}			
+		ej5.unlock();
+		
+	}
+	
+	return nullptr;	
+	
+}
+
+
+pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
+	int realnt;
+	if(p_archivos <= archs.size()){
+		realnt = p_archivos;
+	}else{
+		realnt = archs.size();
+	}		
+	vector<ConcurrentHashMap* > escri;	
+	for (int i = 0; i < archs.size(); ++i){
+        ConcurrentHashMap* nuevi = new (ConcurrentHashMap); 
+        escri.push_back(nuevi);
+   	}
+   	vector<string> archivador;
+	list<string>::iterator	iteaux = archs.begin();
+	while(iteaux != archs.end()){
+		archivador.push_back((*iteaux));
+		iteaux++;
+	}   
+	//aqui archivador tiene la lista archs
+	//int _ultima = 0;	
+	HashescritorConc2* separador = new (HashescritorConc2);
+	separador->h = &escri;
+	separador->vecti = &archivador;
+	separador->ult_pos = 0;//ultimo archivo abierto
+	separador->ult_escri = 0;//ultimo hash escrito
+	pthread_t thread[realnt];
+	int tid;
+	for(tid = 0; tid < realnt; tid++){
+		pthread_create(&thread[tid], NULL, count_words_limthreads_aux2, separador);
+	}
+	for (tid = 0; tid < realnt; ++tid){
+        pthread_join(thread[tid], NULL);
+   	}    	
+   	//aqui todos los hashmap de escri estan llenos    
+   ConcurrentHashMap hash_recolector;
+   for(int i =0; i < escri.size(); i++){
+   	for(int j = 0; j< 26; j++){
+   		Lista<pair< string, int> >::Iterador it = (escri[i]->entrada(j))->CrearIt();
+   		while(it.HaySiguiente()){
+   			hash_recolector.addAndInc(it.Siguiente().first);
+   			it.Avanzar();
+   		}
+   	}
+   }
+   	cout <<"es el maximum"<< endl;
+   	pair<string, int> supermax = hash_recolector.maximum(p_maximos);
+   	cout <<" no es el maximum"<< endl;   	
+  	for (int i = 0; i < archs.size(); ++i){       
+        delete(escri[i]);
+   	}
+   	return supermax;
+}
 
 
 
