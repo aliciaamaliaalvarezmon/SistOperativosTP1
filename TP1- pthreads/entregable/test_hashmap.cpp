@@ -30,8 +30,9 @@ int main(void) {
 	//h.mostrarHash();
 	//h = count_words2(l);
 	//h.mostrarHash();
-	h = count_words3(4, l);	
-	h.mostrarHash();
+	//h = count_words3(4, l);	
+	//h.mostrarHash();
+	max = maximum(2,2,l);
 	return 0;
 }
 

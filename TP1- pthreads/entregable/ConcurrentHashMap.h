@@ -85,8 +85,7 @@ struct HashescritorConc{
 struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
 		vector<string>* vecti;	
-		int	ult_pos;
-		int ult_escri;		
+		int	ult_pos;		
 	};
 
 

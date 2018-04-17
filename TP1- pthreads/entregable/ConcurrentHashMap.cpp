@@ -389,24 +389,18 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 void * count_words_limthreads_aux2(void* aux){	
 	HashescritorConc2 * caux = (HashescritorConc2*) aux;
 	while((caux->ult_pos) < ((caux->vecti)->size())){//and ((*(caux->ult_escri)) < (caux->h)->size())){		
-		ej5.lock();				
-		const char* archivo = (*(caux)->vecti)[(caux->ult_pos)].c_str();
+		ej5.lock();
+		//cout << caux->ult_pos<<endl; 
+		string archivo = (*(caux)->vecti)[(caux->ult_pos)];
+		ConcurrentHashMap* hash_actual = (*(caux->h))[(caux->ult_pos)];
 		(caux->ult_pos)++;	
-		if(caux->ult_pos > (caux->vecti)->size()){
-			break;
-		}	
-		ConcurrentHashMap* hash_actual = (*(caux->h))[(caux->ult_escri)];			
-		(*hash_actual) = count_words(archivo);		
-		(caux->ult_escri)++;	
-		if(caux->ult_escri > (caux->vecti)->size()){//vecti = archivador cuya longitud es igual a la cantidad de hash que tengo
-			break;
-		}			
 		ej5.unlock();
-		
+		if(caux->ult_pos > (caux->vecti)->size()){//vecti = archivador cuya longitud es igual a la cantidad de hash que tengo
+			break;
+		}				
+		(*hash_actual) = count_words(archivo);		
 	}
-	
 	return nullptr;	
-	
 }
 
 
@@ -434,7 +428,7 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 	separador->h = &escri;
 	separador->vecti = &archivador;
 	separador->ult_pos = 0;//ultimo archivo abierto
-	separador->ult_escri = 0;//ultimo hash escrito
+	
 	pthread_t thread[realnt];
 	int tid;
 	for(tid = 0; tid < realnt; tid++){
@@ -444,6 +438,7 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
         pthread_join(thread[tid], NULL);
    	}    	
    	//aqui todos los hashmap de escri estan llenos    
+   
    ConcurrentHashMap hash_recolector;
    for(int i =0; i < escri.size(); i++){
    	for(int j = 0; j< 26; j++){
@@ -454,13 +449,16 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
    		}
    	}
    }
-   	cout <<"es el maximum"<< endl;
+   	//cout <<"es el maximum"<< endl;
    	pair<string, int> supermax = hash_recolector.maximum(p_maximos);
-   	cout <<" no es el maximum"<< endl;   	
+   	//cout <<" no es el maximum"<< endl;   	
   	for (int i = 0; i < archs.size(); ++i){       
         delete(escri[i]);
    	}
    	return supermax;
+	
+	pair<string, int> res("",0);
+	return res;
 }
 
 
