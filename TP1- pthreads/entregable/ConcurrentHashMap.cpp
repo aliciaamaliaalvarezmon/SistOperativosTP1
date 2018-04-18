@@ -13,7 +13,7 @@ using namespace std;
 //mutex posicion[26];
 mutex m;
 mutex m2;
-pthread_mutex_t posicion[26];
+mutex posicion[26];
 mutex max_mut;
 pair<string, int> _maximo("", 0);
 mutex ej4;
@@ -44,9 +44,10 @@ void ConcurrentHashMap::addAndInc(string key){
 //	while(!maxi.compare_exchange_weak(nada, maxi)){
 //	}
 //	addi.fetch_add(1);
-	max_mut.lock();
 	int pos = hash_func(key);	
-	pthread_mutex_lock(&posicion[pos]);		
+	//cout << "entro un add" << " clave: " << key << endl;
+	posicion[pos].lock();
+	//cout << "paso un add" << " clave: " << key << endl;
 	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();	
 	bool esta = false;				
 	while(it.HaySiguiente() and !esta){
@@ -61,8 +62,8 @@ void ConcurrentHashMap::addAndInc(string key){
 	if (esta == false){
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
 	}	
-	pthread_mutex_unlock(&posicion[pos]);
-	max_mut.unlock();
+	//cout << "va a salir un add" << " clave: " << key << endl;
+	posicion[pos].unlock();
 //	addi.fetch_sub(1); 
 }
 
@@ -113,10 +114,11 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	//maxi.fetch_add(1);
 	//while(!addi.compare_exchange_weak(nada, addi)){
 //	}
+	//cout << "entra un max" << endl;
 	for(int i = 0; i < 26; i++){
-		pthread_mutex_lock(&posicion[i]);	
+		posicion[i].lock();
 	}
-	max_mut.lock();	
+	//cout << "paso un max un max" << endl;
 	int realnt;
 	if(nt <= 26){
 		realnt = nt;
@@ -136,9 +138,9 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
    	}
   // 	maxi.fetch_sub(1); 
   	for(int i = 0; i < 26; i++){
-		pthread_mutex_unlock(&posicion[i]);	
+		posicion[i].unlock();
 	}
-	max_mut.unlock();	    	 	
+	//cout << "salio un max" << endl;  	 	
    	return _maximo;   	
 }
 
@@ -458,7 +460,7 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 
 
 
-pair<string, unsigned int> maximum2(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
+pair<string, unsigned int> maximumConcurrente(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
 	int realnt;
 	if(p_archivos <= archs.size()){
 		realnt = p_archivos;
