@@ -6,14 +6,15 @@
 
 using namespace std;
 
-std::atomic<int> maxi(0);
-std::atomic<int> addi(0);
-int nada = 0;
+//std::atomic<int> maxi(0);
+//std::atomic<int> addi(0);
+//int nada = 0;
 
 //mutex posicion[26];
 mutex m;
 mutex m2;
 pthread_mutex_t posicion[26];
+mutex max_mut;
 pair<string, int> _maximo("", 0);
 mutex ej4;
 mutex ej4b;
@@ -40,9 +41,10 @@ ConcurrentHashMap::~ConcurrentHashMap(){
 
 
 void ConcurrentHashMap::addAndInc(string key){
-	while(!maxi.compare_exchange_weak(nada, maxi)){
-	}
-	addi.fetch_add(1);
+//	while(!maxi.compare_exchange_weak(nada, maxi)){
+//	}
+//	addi.fetch_add(1);
+	max_mut.lock();
 	int pos = hash_func(key);	
 	pthread_mutex_lock(&posicion[pos]);		
 	Lista<pair<string, int>>::Iterador it = (*tabla[pos]).CrearIt();	
@@ -60,7 +62,8 @@ void ConcurrentHashMap::addAndInc(string key){
 		(*tabla[pos]).push_front(pair<string, int>(key, 1));
 	}	
 	pthread_mutex_unlock(&posicion[pos]);
-	addi.fetch_sub(1); 
+	max_mut.unlock();
+//	addi.fetch_sub(1); 
 }
 
 bool ConcurrentHashMap::member(string key){
@@ -107,9 +110,13 @@ void* max(void* aux){
 }
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){	
-	maxi.fetch_add(1);
-	while(!addi.compare_exchange_weak(nada, addi)){
-	}	
+	//maxi.fetch_add(1);
+	//while(!addi.compare_exchange_weak(nada, addi)){
+//	}
+	for(int i = 0; i < 26; i++){
+		pthread_mutex_lock(&posicion[i]);	
+	}
+	max_mut.lock();	
 	int realnt;
 	if(nt <= 26){
 		realnt = nt;
@@ -127,9 +134,12 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
    	}
-   	maxi.fetch_sub(1);     	 	
-   	return _maximo;
-   	//maxi--; 
+  // 	maxi.fetch_sub(1); 
+  	for(int i = 0; i < 26; i++){
+		pthread_mutex_unlock(&posicion[i]);	
+	}
+	max_mut.unlock();	    	 	
+   	return _maximo;   	
 }
 
 void ConcurrentHashMap::mostrarHash(){
@@ -447,6 +457,41 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 }
 
 
+
+pair<string, unsigned int> maximum2(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
+	int realnt;
+	if(p_archivos <= archs.size()){
+		realnt = p_archivos;
+	}else{
+		realnt = archs.size();
+	}		
+	ConcurrentHashMap  escri;		
+   	vector<string> archivador;
+	list<string>::iterator	iteaux = archs.begin();
+	while(iteaux != archs.end()){
+		archivador.push_back((*iteaux));
+		iteaux++;
+	}   
+	//aqui archivador tiene la lista archs
+	//int _ultima = 0;	
+	HashescritorConc* separador = new (HashescritorConc);
+	separador->h = &escri;
+	separador->vecti = &archivador;
+	separador->ult.store(0);//ultimo archivo abierto	
+	pthread_t thread[realnt];
+	int tid;
+	for(tid = 0; tid < realnt; tid++){
+		pthread_create(&thread[tid], NULL, count_words_limthreads_aux, separador);
+	}
+	for (tid = 0; tid < realnt; ++tid){
+        pthread_join(thread[tid], NULL);
+   	}
+   	//cout <<"es el maximum"<< endl;
+   	pair<string, int> supermax = escri.maximum(p_maximos);
+   	//cout <<" no es el maximum"<< endl;
+   	delete(separador);      	
+   	return supermax;
+}
 
 
 

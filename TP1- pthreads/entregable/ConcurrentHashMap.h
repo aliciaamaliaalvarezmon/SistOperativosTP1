@@ -33,14 +33,14 @@ public:
 	void *maxaux(atomic<int> &ultima);
 	Lista<pair <string, int> >* entrada(int i);
 	pair<string, int> maximum(unsigned int nt);
-	ConcurrentHashMap& operator=(const ConcurrentHashMap& TuVieja){	
+	ConcurrentHashMap& operator=(const ConcurrentHashMap& other){	
 		while(tabla.size() > 0){
 			delete(tabla[tabla.size()-1]);
 			tabla.pop_back();
 		}
 		for(int i =0; i < 26;  i++){
 			//Lista<pair<string, int> >* lant = TuVieja._entradas[i];
-			Lista<pair<string, int> >::Iterador it = (*TuVieja.tabla[i]).CrearIt();
+			Lista<pair<string, int> >::Iterador it = (*other.tabla[i]).CrearIt();
 			Lista<pair<string, int> >* l = new (Lista<pair<string, int> >);
 			while(it.HaySiguiente()){
 				(*l).push_front(it.Siguiente());
