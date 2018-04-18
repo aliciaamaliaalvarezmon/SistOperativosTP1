@@ -16,6 +16,7 @@ all: $(BIN) $(OBJ)
 
 tp: 
 	$(CXX) $(CXXFLAGS) $(LDLIBS) ConcurrentHashMap.h
+	$(CXX) $(CXXFLAGS) $(LDLIBS) CountWord.h
 	$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test test_hashmap.cpp ConcurrentHashMap.cpp  
 
 $(BIN): ListaAtomica.hpp

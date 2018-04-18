@@ -30,7 +30,7 @@ public:
 	void mostrarHash();
 	void addAndInc(string key);
 	bool member(string key);
-	void *maxaux(int &ultima);
+	void *maxaux(atomic<int> &ultima);
 	Lista<pair <string, int> >* entrada(int i);
 	pair<string, int> maximum(unsigned int nt);
 	ConcurrentHashMap& operator=(const ConcurrentHashMap& TuVieja){	
@@ -56,7 +56,7 @@ public:
 
 struct Hashcontador{
 		ConcurrentHashMap* h;
-		int _ultima;
+		atomic<int> _ultima;
 	};
 
 struct Hashescritor{
@@ -73,7 +73,7 @@ struct Hashescritor{
 struct HashescritorConc{
 		ConcurrentHashMap* h;		
 		vector<string>* vecti;	
-		int ult;
+		atomic<int> ult;
 	};	
 /*struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
@@ -85,13 +85,7 @@ struct HashescritorConc{
 struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
 		vector<string>* vecti;	
-		int	ult_pos;		
+		atomic<int>	ult_pos;		
 	};
-
-
-ConcurrentHashMap count_words(string arch);
-ConcurrentHashMap count_words2(list<string>archs);
-ConcurrentHashMap count_words3(unsigned int n, list<string>archs);
-pair<string, unsigned int>maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 
 #endif /* HASHMAP_CONCURRENTE_H__ */	
