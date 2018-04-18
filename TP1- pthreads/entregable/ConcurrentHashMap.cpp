@@ -422,13 +422,17 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
         pthread_join(thread[tid], NULL);
    	}    	
    	//aqui todos los hashmap de escri estan llenos    
-   
    ConcurrentHashMap hash_recolector;
+   int veces;
    for(int i =0; i < escri.size(); i++){
    	for(int j = 0; j< 26; j++){
    		Lista<pair< string, int> >::Iterador it = (escri[i]->entrada(j))->CrearIt();
    		while(it.HaySiguiente()){
-   			hash_recolector.addAndInc(it.Siguiente().first);
+   			veces = it.Siguiente().second;
+   			while(veces > 0){   			
+   				hash_recolector.addAndInc(it.Siguiente().first);
+   				veces--;
+   			}
    			it.Avanzar();
    		}
    	}
