@@ -23,7 +23,7 @@ int main(void) {
 		while(j <100){
 
 			clock_gettime(CLOCK_REALTIME,&start);
-			maximum(3,3,l);
+			maximumConcurrente(3,3,l);
 			clock_gettime(CLOCK_REALTIME, &stop);
 			aux1 = aux1 + ((stop.tv_sec - start.tv_sec) + ((stop.tv_nsec - start.tv_nsec)*(0.000000001)));
 			j++;
