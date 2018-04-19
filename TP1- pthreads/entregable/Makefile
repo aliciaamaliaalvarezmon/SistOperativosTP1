@@ -9,7 +9,7 @@ LDLIBS = -pthread
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(LDLIBS) -c $<
 
-BIN = test-2 test-3 
+BIN = test-2 test-3 test-5
 OBJ = ConcurrentHashMap.cpp
 
 all: $(BIN) $(OBJ)
@@ -61,5 +61,5 @@ test-5-run: test-5
 	rm -f corpus-max corpus-[0-4]
 
 clean:
-	rm -f $(BIN) $(OBJ)
+	rm -f $(BIN) 
 	rm -f corpus-*
