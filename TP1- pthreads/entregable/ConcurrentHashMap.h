@@ -28,11 +28,10 @@ public:
 	ConcurrentHashMap();
 	~ConcurrentHashMap();
 	void mostrarHash();
-	void addAndInc(string key);
+	void addAndInc(string key, bool test = false);
 	bool member(string key);
-	void *maxaux(atomic<int> &ultima);
 	Lista<pair <string, int> >* entrada(int i);
-	pair<string, int> maximum(unsigned int nt);
+	pair<string, int> maximum(unsigned int nt, bool test= false);
 	ConcurrentHashMap& operator=(const ConcurrentHashMap& other){	
 		while(tabla.size() > 0){
 			delete(tabla[tabla.size()-1]);
