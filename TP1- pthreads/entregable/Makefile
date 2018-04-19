@@ -18,9 +18,9 @@ compilar:
 	$(CXX) $(CXXFLAGS) $(LDLIBS) ConcurrentHashMap.h
 	$(CXX) $(CXXFLAGS) $(LDLIBS) CountWord.h
 	$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test test_addMaxi.cpp ConcurrentHashMap.cpp
-	$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test2 test_countWords.cpp ConcurrentHashMap.cpp
+	#$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test2 test_countWords.cpp ConcurrentHashMap.cpp
 	$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test3 test_maximum.cpp ConcurrentHashMap.cpp
-	$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test4 test_exmutua.cpp ConcurrentHashMap.cpp
+	#$(CXX) $(CXXFLAGS) $(LDLIBS) -g -o test4 test_exmutua.cpp ConcurrentHashMap.cpp
 
 ejecutar: test test2 test3 test4
 	./test

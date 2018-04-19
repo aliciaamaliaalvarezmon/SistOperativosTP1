@@ -16,14 +16,21 @@ int main(void) {
 
 	ConcurrentHashMap h;
 	list<string> l;
+
 	int i = 0;
-	while(i < 100){
-		int j = 0;
+	while(i < 50){
 		l.push_front("corpus");
+		i++;
+	}
+
+
+	i = 0;
+	while(i < 50){
+		int j = 0;
 		while(j <100){
 
 			clock_gettime(CLOCK_REALTIME,&start);
-			maximumConcurrente(3,3,l);
+			maximumConcurrente(i,3,l);
 			clock_gettime(CLOCK_REALTIME, &stop);
 			aux1 = aux1 + ((stop.tv_sec - start.tv_sec) + ((stop.tv_nsec - start.tv_nsec)*(0.000000001)));
 			j++;
