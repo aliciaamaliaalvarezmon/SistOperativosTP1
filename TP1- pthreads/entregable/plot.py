@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set(style="darkgrid")
+#import seaborn as sns
+#sns.set(style="darkgrid")
 
 def datos(nombre_archivo):
     valores = open(nombre_archivo, "r") 
@@ -21,13 +21,14 @@ def bloques(valores,intervalo):
 
 nada = [None]
 
-concuSI = datos(".txt")
-concuNO = datos(".txt")
+concuSI = datos("concuSI.txt")
+concuNO = datos("concuNO.txt")
 
-print sarasa
+#print(sarasa)
 
-#plt.semilogy()
-#plt.plot(sarasa, label="")
+plt.semilogy()
+plt.plot(concuSI, label="Concurrente")
+plt.plot(concuNO, label="No Concurrente")
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 #plt.legend( ('Relaciones'), loc = 'upper left')
 plt.grid(True)
