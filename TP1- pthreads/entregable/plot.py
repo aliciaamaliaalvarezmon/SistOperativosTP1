@@ -26,7 +26,7 @@ concuNO = datos("concuNO.txt")
 
 #print(sarasa)
 
-plt.semilogy()
+#plt.semilogy()
 plt.plot(concuSI, label="Concurrente")
 plt.plot(concuNO, label="No Concurrente")
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -38,8 +38,6 @@ plt.axis('tight')
 plt.xlabel(r"Cantidad de Archivos", fontsize = 15, color = 'black')
 plt.ylabel(r"Tiempo en segundos", fontsize = 15, color = 'black')
 plt.title(' Maximum Concurrente vs No Concurrente',fontsize = 15, color = 'black', verticalalignment = 'baseline', horizontalalignment = 'center')
-<<<<<<< HEAD
+
 plt.show()
-=======
-plt.show()
->>>>>>> refs/remotes/origin/master
+
