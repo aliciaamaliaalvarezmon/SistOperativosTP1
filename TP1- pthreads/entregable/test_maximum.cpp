@@ -4,17 +4,49 @@
 using namespace std;
 
 int main(void) {
+
+	struct timespec start,stop;
+	double accum;
+
+	clock_gettime(CLOCK_REALTIME,&start);
+	clock_gettime(CLOCK_REALTIME, &stop);
+
+	double aux1=0;
+	double aux2=0;
+
 	ConcurrentHashMap h;
 	list<string> l;
-	l.push_front("Prueba.txt");
-	l.push_front("Prueba2.txt");
-	l.push_front("Prueba3.txt");
-	l.push_front("Prueba4.txt");
+	int i = 0;
+	while(i < 100){
+		int j = 0;
+		l.push_front("corpus");
+		while(j <100){
 
-	pair<string, int> max;
-	max = maximum(3,3,l);
-	cout << max.first << " " << max.second << endl;
-	max = maximumConcurrente(3,3,l);
-	cout << max.first << " " << max.second << endl;	
+			clock_gettime(CLOCK_REALTIME,&start);
+			maximum(3,3,l);
+			clock_gettime(CLOCK_REALTIME, &stop);
+			aux1 = aux1 + ((stop.tv_sec - start.tv_sec) + ((stop.tv_nsec - start.tv_nsec)*(0.000000001)));
+			j++;
+		}
+		cout << (aux1/100)<< endl;
+		i++;
+	}
+
+	/*
+	//pair<string, int> max;
+	//max = 
+	clock_gettime(CLOCK_REALTIME,&start);
+	maximum(3,3,l);
+	clock_gettime(CLOCK_REALTIME, &stop);
+	cout << (stop.tv_sec - start.tv_sec) + ((stop.tv_nsec - start.tv_nsec)*(0.000000001)) << endl;
+	//cout << max.first << " " << max.second << endl;
+	//max = 
+	clock_gettime(CLOCK_REALTIME,&start);
+	maximumConcurrente(3,3,l);
+	clock_gettime(CLOCK_REALTIME, &stop);
+	cout << (stop.tv_sec - start.tv_sec) + ((stop.tv_nsec - start.tv_nsec)*(0.000000001)) << endl;
+	//cout << max.first << " " << max.second << endl;	
+	*/
 	return 0;
 }
+

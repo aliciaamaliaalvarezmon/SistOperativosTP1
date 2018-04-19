@@ -12,13 +12,13 @@ int main(void) {
 	l.push_front("Prueba4.txt");
 
 	h = count_words("Prueba.txt");
-	h.mostrarHash();
-	cout << "------------------------------------------" << endl;
-	h = count_words2(l);
-	h.mostrarHash();
-	cout << "------------------------------------------" << endl;
-	h = count_words3(3,l);
-	h.mostrarHash();
+	//h.mostrarHash();
+	//cout << "------------------------------------------" << endl;
+	//h = count_words2(l);
+	//h.mostrarHash();
+	//cout << "------------------------------------------" << endl;
+	//h = count_words3(3,l);
+	//h.mostrarHash();
 	
 	return 0;
 }
