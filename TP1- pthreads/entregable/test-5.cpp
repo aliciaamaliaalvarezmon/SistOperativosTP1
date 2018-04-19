@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
-#include "ConcurrentHashMap.hpp"
+#include "ConcurrentHashMap.h"
+#include "CountWord.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ int main(int argc, char **argv) {
 		cerr << "uso: " << argv[0] << " #tarchivos #tmaximum" << endl;
 		return 1;
 	}
-	p = ConcurrentHashMap::maximum(atoi(argv[1]), atoi(argv[2]), l);
+	p = maximum(atoi(argv[1]), atoi(argv[2]), l);
 	cout << p.first << " " << p.second << endl;
 
 	return 0;

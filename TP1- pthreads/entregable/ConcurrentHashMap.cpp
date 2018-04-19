@@ -162,7 +162,12 @@ ConcurrentHashMap count_words(string arch){
 	input.open(archivo);	
 	string alo;	
 	while(!input.eof()){
-		input >> alo;		
+		input >> alo;
+		//Esto es por si el archivo termina con un salto de linea (new line)		
+		input.ignore();
+		if(input.peek() == 10){
+			break;
+		}
 		h.addAndInc(alo);	
 	}	
 	return h;	
@@ -177,6 +182,10 @@ void * count_wordsaux(void* aux){
 	string alo;
 	while(!input.eof()){
 		input >> alo;
+		input.ignore();
+		if(input.peek() == 10){
+			break;
+		}
 		(caux->h)->addAndInc(alo); 
 	}		
 	return nullptr;	
@@ -277,7 +286,11 @@ void * count_words_limthreads_aux(void* aux){
 		input.open(archivo);
 		string alo;
 		while(!input.eof()){			
-			input >> alo;			
+			input >> alo;	
+			input.ignore();
+			if(input.peek() == 10){
+				break;
+			}		
 			(caux->h)->addAndInc(alo);
 		}		
 		input.close();		
