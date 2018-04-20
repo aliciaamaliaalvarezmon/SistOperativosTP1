@@ -1,21 +1,16 @@
 #include "ConcurrentHashMap.h"
 #include "CountWord.h"
-//template <typename T>
 
 
 
 using namespace std;
 
 
-mutex m;
+
 mutex m2;
 mutex posicion[26];
-mutex max_mut;
 pair<string, int> _maximo("", 0);
-mutex ej4;
-mutex ej4b;
-mutex ej5;
-mutex ej5b;
+
 
 
 ConcurrentHashMap::ConcurrentHashMap(){	
@@ -34,9 +29,6 @@ ConcurrentHashMap::~ConcurrentHashMap(){
 
 
 void ConcurrentHashMap::addAndInc(string key, bool test){
-//	while(!maxi.compare_exchange_weak(nada, maxi)){
-//	}
-//	addi.fetch_add(1);
 	int pos = hash_func(key);
 	if(test){	
 		cout << "entro un add" << " clave: " << key << endl;
@@ -63,7 +55,6 @@ void ConcurrentHashMap::addAndInc(string key, bool test){
 		cout << "va a salir un add" << " clave: " << key << endl;
 	}
 	posicion[pos].unlock();
-//	addi.fetch_sub(1); 
 }
 
 bool ConcurrentHashMap::member(string key){
@@ -102,15 +93,10 @@ void * maxola(void* aux){
 		
 }
 
-pair<string, int> ConcurrentHashMap::maximum(unsigned int nt, bool test){	
-	//maxi.fetch_add(1);
-	//while(!addi.compare_exchange_weak(nada, addi)){
-//	}
-	//cout << "entra un max" << endl;
+pair<string, int> ConcurrentHashMap::maximum(unsigned int nt, bool test){
 	for(int i = 0; i < 26; i++){
 		posicion[i].lock();
-	}
-	//cout << "paso un max un max" << endl;
+	}	
 	int realnt;
 	if(nt <= 26){
 		realnt = nt;
@@ -127,12 +113,10 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt, bool test){
 	}
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
-   	}
-  // 	maxi.fetch_sub(1); 
+   	} 
   	for(int i = 0; i < 26; i++){
 		posicion[i].unlock();
-	}
-	//cout << "salio un max" << endl;  	 	
+	}	 	 	
    	return _maximo;   	
 }
 
@@ -184,7 +168,7 @@ void * count_wordsaux(void* aux){
 	
 }
 
-//version vieje
+
 
 ConcurrentHashMap count_words2(std::list<string>archs){
 	ConcurrentHashMap escri;
@@ -233,7 +217,7 @@ void * count_words_limthreads_aux(void* aux){
 	
 }
 
-//version nueva
+
 ConcurrentHashMap count_words3(unsigned int n, list<string> archs){
 	int realnt;
 	if(n <= archs.size()){
@@ -273,7 +257,7 @@ ConcurrentHashMap count_words3(unsigned int n, list<string> archs){
 void * count_words_limthreads_aux2(void* aux){	
 	HashescritorConc2 * caux = (HashescritorConc2*) aux;
 	int x;
-	while( (x = (caux->ult_pos).fetch_add(1)) < ((caux->vecti)->size())){//and ((*(caux->ult_escri)) < (caux->h)->size())){		
+	while( (x = (caux->ult_pos).fetch_add(1)) < ((caux->vecti)->size())){	
 		string archivo = (*(caux)->vecti)[x];
 		ConcurrentHashMap* hash_actual = (*(caux->h))[x];	
 		(*hash_actual) = count_words(archivo);		
@@ -300,8 +284,7 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 		archivador.push_back((*iteaux));
 		iteaux++;
 	}   
-	//aqui archivador tiene la lista archs
-	//int _ultima = 0;	
+	//aqui archivador tiene la lista archs		
 	HashescritorConc2* separador = new (HashescritorConc2);
 	separador->h = &escri;
 	separador->vecti = &archivador;
@@ -314,8 +297,7 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 	}
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
-   	}    	
-   	//aqui todos los hashmap de escri estan llenos    
+   	}    
    ConcurrentHashMap hash_recolector;
    int veces;
    for(int i =0; i < escri.size(); i++){
@@ -330,10 +312,8 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
    			it.Avanzar();
    		}
    	}
-   }
-   	//cout <<"es el maximum"<< endl;
-   	pair<string, int> supermax = hash_recolector.maximum(p_maximos);
-   	//cout <<" no es el maximum"<< endl;   	
+   }   	
+   	pair<string, int> supermax = hash_recolector.maximum(p_maximos);   	 	
   	for (int i = 0; i < archs.size(); ++i){       
         delete(escri[i]);
    	}
@@ -343,37 +323,8 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 
 
 pair<string, unsigned int> maximumConcurrente(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){	
-	int realnt;
-	if(p_archivos <= archs.size()){
-		realnt = p_archivos;
-	}else{
-		realnt = archs.size();
-	}		
-	ConcurrentHashMap  escri;		
-   	vector<string> archivador;
-	list<string>::iterator	iteaux = archs.begin();
-	while(iteaux != archs.end()){
-		archivador.push_back((*iteaux));
-		iteaux++;
-	}   
-	//aqui archivador tiene la lista archs
-	//int _ultima = 0;	
-	HashescritorConc* separador = new (HashescritorConc);
-	separador->h = &escri;
-	separador->vecti = &archivador;
-	separador->ult.store(0);//ultimo archivo abierto	
-	pthread_t thread[realnt];
-	int tid;
-	for(tid = 0; tid < realnt; tid++){
-		pthread_create(&thread[tid], NULL, count_words_limthreads_aux, separador);
-	}
-	for (tid = 0; tid < realnt; ++tid){
-        pthread_join(thread[tid], NULL);
-   	}
-   	//cout <<"es el maximum"<< endl;
-   	pair<string, int> supermax = escri.maximum(p_maximos);
-   	//cout <<" no es el maximum"<< endl;
-   	delete(separador);      	
+	ConcurrentHashMap  escri = count_words3(p_archivos, archs);   	
+   	pair<string, int> supermax = escri.maximum(p_maximos);	
    	return supermax;
 }
 

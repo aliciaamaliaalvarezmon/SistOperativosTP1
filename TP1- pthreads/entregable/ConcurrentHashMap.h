@@ -9,15 +9,13 @@
 #include <string>
 #include <stdio.h>
 #include <list>
-//template <typename T>
+
 using namespace std;
 
 
 class ConcurrentHashMap{
 private:
-//public:	
-	vector<Lista<pair<string, int> >* > tabla; //hay 26 letras en el ABC
-	//pair<string, int> _maximo; // pair<string, int> maximo("", 0), sino es asi por default va a ver que cambiarlo;	 
+	vector<Lista<pair<string, int> >* > tabla; //hay 26 letras en el ABC sin la ñ		 
 	int hash_func(string key){
 	 int numero = key[0] - '0'- 49;
 		return (numero);
@@ -37,8 +35,7 @@ public:
 			delete(tabla[tabla.size()-1]);
 			tabla.pop_back();
 		}
-		for(int i =0; i < 26;  i++){
-			//Lista<pair<string, int> >* lant = TuVieja._entradas[i];
+		for(int i =0; i < 26;  i++){			
 			Lista<pair<string, int> >::Iterador it = (*other.tabla[i]).CrearIt();
 			Lista<pair<string, int> >* l = new (Lista<pair<string, int> >);
 			while(it.HaySiguiente()){
@@ -62,25 +59,14 @@ struct Hashescritor{
 		ConcurrentHashMap* h;
 		string arch;		
 	};
-/*struct HashescritorConc{
-		ConcurrentHashMap* h;		
-		list<string>* lista;	
-		list<string>::iterator	ite;		
-	};
-*/
+
 
 struct HashescritorConc{
 		ConcurrentHashMap* h;		
 		vector<string>* vecti;	
 		atomic<int> ult;
 	};	
-/*struct HashescritorConc2{
-		vector<ConcurrentHashMap* >* h;		
-		list<string>* lista;	
-		list<string>::iterator	ite;
-		int* ult_escri;		
-	};
-*/
+
 struct HashescritorConc2{
 		vector<ConcurrentHashMap* >* h;		
 		vector<string>* vecti;	
