@@ -6,56 +6,57 @@
 
 using namespace std;
 
-int x;
+atomic<int> x;
+
 
 struct prueba{
-	ConcurrentHashMap*  h;		
-	int i;
+	ConcurrentHashMap*  h;
 	string s;	
 };
 
 
 void * llamada(void* a){
-	
+	//Ejemplo donde pasan 2 addinc al mismo tiempo (distinta lista) y despues de que salgan pasan los max
+	// 2 addinc, 4 max
 	prueba * aux = (prueba*) a;
-	
-	if(x%2==0){
-		if(x==0){
-			aux->s = "calor";
-		}
-		if(x==2){
-			aux->s = "agua";
-		}
-		if(x==4){
-			aux->s = "tuvieja";
-		}
-		if(x==6){
-			aux->s = "romi";
+	int y=0;
+	while((y=x.fetch_add(1)) < 6){
+		if(y < 3){
+			if(y==0){
+				aux->s = "calor";
+			}
+			if(y==1){
+				aux->s = "agua";
+			}
+			if(y==2){
+				aux->s = "tuvieja";
+			}
+			(aux->h)->addAndInc(aux->s,true);
 		}else{
-			aux->s = "papa";
+			(aux->h)->maximum(3,true);
 		}
-		(aux->h)->addAndInc(aux->s);
-	}else{
-		(aux->h)->maximum(3);
 	}
 }
 
 int main(void) {
 	ConcurrentHashMap tablita;
-	srand(time(NULL));
+	x.store(0);	
 	prueba j;
 	j.h = &tablita;
-	j.i = 8;
 	
-	pthread_t thread[5];
+	pthread_t thread[6];
 	int tid;
-	for(tid = 0; tid < 5; tid++){
-		x = rand()%10;
+	for(tid = 0; tid < 6; tid++){
 		pthread_create(&thread[tid], NULL, llamada, &j);
 	}
-	for (tid = 0; tid < 5; ++tid){
+	for (tid = 0; tid < 6; ++tid){
         pthread_join(thread[tid], NULL);
    	}  
+
+   	x.store(0);
+
+   	 
+
 	
 	return 0;
 }

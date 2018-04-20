@@ -10,7 +10,7 @@ int main(void) {
 	printf("%d\n", h.member(p) );
 	h.addAndInc(p);
 	printf("%d\n", h.member(p) );
-	h.addAndInc(p);
+	h.addAndInc(p,true);
 	pair<string, int> max;
 	max = h.maximum(1);	
 	cout << max.first << " " << max.second << endl;
