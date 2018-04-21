@@ -74,5 +74,9 @@ test-5-run: test-5
 	rm -f corpus-max corpus-[0-4]
 
 clean:
+	rm -f test
+	rm -f test2
+	rm -f test3
+	rm -f test4
 	rm -f $(BIN) 
 	rm -f corpus-*
