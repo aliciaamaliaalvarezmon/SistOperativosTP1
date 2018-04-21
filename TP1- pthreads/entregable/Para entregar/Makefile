@@ -35,7 +35,6 @@ test-2: $(OBJ) test-2.cpp
 	
 test-2-run: test-2
 	awk -f corpus.awk corpus | sort >corpus-post
-	./test-2 | sort > salida.txt
 	./test-2 | sort | diff -u - corpus-post
 	rm -f corpus-post
 
@@ -56,7 +55,7 @@ test-4-run: test-4
 	cat corpus-max
 	for i in 0 1 2 3 4; do sed -n "$$((i * 500 + 1)),$$(((i + 1) * 500))p" corpus >corpus-"$$i"; done
 	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
-		./test-5 $$((i + 1)) $$((j + 1)) | diff -u - corpus-max; \
+		./test-4 $$((i + 1)) $$((j + 1)) | diff -u - corpus-max; \
 	done; done
 	rm -f corpus-max corpus-[0-4]
 
@@ -78,5 +77,8 @@ clean:
 	rm -f test2
 	rm -f test3
 	rm -f test4
-	rm -f $(BIN) 
+	rm -f test-2
+	rm -f test-3
+	rm -f test-4
+	rm -f test-5
 	rm -f corpus-*
