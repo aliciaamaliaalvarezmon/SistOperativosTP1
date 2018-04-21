@@ -30,7 +30,7 @@ void * llamada(void* a){
 				aux->s = "agua";
 			}
 			if(y==2){
-				aux->s = "tuvieja";
+				aux->s = "semaforo";
 			}
 			(aux->h)->addAndInc(aux->s, true);
 		}else{
@@ -45,7 +45,7 @@ void* llamada2(void* a){
 	int y=0;
 	while((y=x.fetch_add(1)) < 6){
 		if(y < 3){
-			aux->s = "tuvieja";
+			aux->s = "semaforo";
 			(aux->h)->addAndInc(aux->s,true);
 		}else{
 			(aux->h)->maximum(3,true);

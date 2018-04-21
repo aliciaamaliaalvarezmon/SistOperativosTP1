@@ -1,5 +1,0 @@
-Para compilar el tp, usar "make compilar"
-
-Para ejecutar todos los tests nuestros, usar "make ejecutar" despues de usar "make compilar"
-
-No modificamos la forma de compilar y ejecutar los test de la cátedra que estaban en el makefile por defecto
