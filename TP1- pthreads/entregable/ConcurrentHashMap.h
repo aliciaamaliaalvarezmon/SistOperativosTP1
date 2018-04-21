@@ -26,7 +26,7 @@ public:
 	ConcurrentHashMap();
 	~ConcurrentHashMap();
 	void mostrarHash();
-	void addAndInc(string key, bool test = false);
+	void addAndInc(string key, bool test = false); //Los booleanos predefinidos los usamos en el test de exclusion mutua
 	bool member(string key);
 	Lista<pair <string, int> >* entrada(int i);
 	pair<string, int> maximum(unsigned int nt, bool test= false);

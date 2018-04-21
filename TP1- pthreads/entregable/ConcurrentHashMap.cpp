@@ -94,8 +94,14 @@ void * maxola(void* aux){
 }
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt, bool test){
+	if(test){
+		cout << "Entro un max" << endl;
+	}
 	for(int i = 0; i < 26; i++){
 		posicion[i].lock();
+	}
+	if(test){
+		cout << "Paso un max" << endl;
 	}	
 	int realnt;
 	if(nt <= 26){
@@ -114,6 +120,10 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt, bool test){
 	for (tid = 0; tid < realnt; ++tid){
         pthread_join(thread[tid], NULL);
    	} 
+
+   	if(test){
+   		cout << "Va a salir un max" << endl;
+   	}
   	for(int i = 0; i < 26; i++){
 		posicion[i].unlock();
 	}	 	 	
